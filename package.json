@@ -1,0 +1,26 @@
+{
+  "name": "@vuedi/root",
+  "description": "Monorepo for Vue Dependency Injection (DI) libraries",
+  "private": true,
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "i:all": "pnpm --recursive install",
+    "clean": "find . -name node_modules -type d -exec rm -rf {} + && rm -rf node_modules && pnpm --recursive exec rimraf dist",
+    "core:build": "pnpm --filter @vuedi/core build",
+    "core:dev": "pnpm --filter @vuedi/core dev",
+    "playground:dev": "pnpm --filter @vuedi/playground dev",
+    "typecheck": "pnpm --recursive typecheck",
+    "test": "pnpm --recursive test",
+    "lint": "pnpm --recursive lint"
+  },
+  "dependencies": {
+    "vue": "catalog:",
+    "typescript": "catalog:"
+  },
+  "devDependencies": {
+    "rimraf": "^6.0.1"
+  },
+  "packageManager": "pnpm@10.18.0"
+}

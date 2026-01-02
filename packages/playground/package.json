@@ -1,0 +1,31 @@
+{
+  "name": "@vuedi/playground",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": "^20.19.0 || >=22.12.0"
+  },
+  "scripts": {
+    "dev": "vite",
+    "type-check": "vue-tsc --build"
+  },
+  "dependencies": {
+    "@vuedi/core": "workspace:*",
+    "pinia": "^3.0.4",
+    "vue": "catalog:",
+    "vue-router": "^4.6.4"
+  },
+  "devDependencies": {
+    "@tsconfig/node24": "^24.0.3",
+    "@types/node": "^24.10.4",
+    "@vitejs/plugin-vue": "^6.0.3",
+    "@vue/tsconfig": "^0.8.1",
+    "npm-run-all2": "^8.0.4",
+    "typescript": "catalog:",
+    "vite": "^7.3.0",
+    "vite-plugin-vue-devtools": "^8.0.5",
+    "vue-tsc": "^3.2.1"
+  },
+  "packageManager": "pnpm@10.18.0"
+}
