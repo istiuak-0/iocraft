@@ -6,20 +6,24 @@ type VueDIOptions = {
   services: ServiceConstructor[];
 };
 
-export const vuedi: FunctionPlugin<VueDIOptions> = (app, options) => {
-  options.services.forEach(item => {
-    const serviceInstance = serviceRegistry.has(item);
-    if (!serviceInstance) {
-      serviceRegistry.set(item, new item());
-    }
-  });
+export const vuedi: FunctionPlugin<[Partial<VueDIOptions>?]> = (app, options?: Partial<VueDIOptions>) => {
+  
+  ///Eagerly crete instances
+  if (options?.services) {
+    options.services.forEach(item => {
+      const serviceInstance = serviceRegistry.has(item);
+      if (!serviceInstance) {
+        serviceRegistry.set(item, new item());
+      }
+    });
+  }
 
+  /// Run unmount hook for global hooks
   app.onUnmount(() => {
-    serviceRegistry.forEach((value,_key) => {
+    serviceRegistry.forEach((value, _key) => {
       if (ImplementsUnmounted(value)) {
         (value as ServiceWithUnmounted<typeof value>).onUnmounted();
       }
     });
   });
-  
 };

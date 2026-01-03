@@ -5,7 +5,8 @@ import { ref } from 'vue';
   in: 'root',
 })
 export class AppService implements UnMounted {
-  onUnmounted(): void {}
-
-  data = ref('dafd');
+  isUnmounted = ref(false);
+  onUnmounted(): void {
+    console.log('applcaiton unmounted');
+  }
 }
