@@ -1,7 +1,7 @@
 import eslintJS from '@eslint/js';
 import tseslint from '@typescript-eslint/eslint-plugin';
 import tsParser from '@typescript-eslint/parser';
-
+import globals from 'globals';
 export default [
   {
     ignores: ['dist/', 'node_modules/'],
@@ -19,6 +19,7 @@ export default [
       '@typescript-eslint': tseslint,
     },
     rules: {
+      ...globals.browser,
       ...tseslint.configs.recommended.rules,
       '@typescript-eslint/no-unused-vars': 'off',
       'no-console': 'off',
