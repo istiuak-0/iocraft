@@ -7,8 +7,7 @@ type VueDIOptions = {
 };
 
 export const vuedi: FunctionPlugin<[Partial<VueDIOptions>?]> = (app, options?: Partial<VueDIOptions>) => {
-  
-  ///Eagerly crete instances
+  ///Eagerly create instances
   if (options?.services) {
     options.services.forEach(item => {
       const serviceInstance = serviceRegistry.has(item);
@@ -18,7 +17,7 @@ export const vuedi: FunctionPlugin<[Partial<VueDIOptions>?]> = (app, options?: P
     });
   }
 
-  /// Run unmount hook for global hooks
+  /// Run unmount hook for app scoped services
   app.onUnmount(() => {
     serviceRegistry.forEach((value, _key) => {
       if (ImplementsUnmounted(value)) {

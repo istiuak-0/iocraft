@@ -7,6 +7,8 @@ export class BinanceService implements UnMounted {
   public connected = ref(false);
   public lastMessage = ref<any>({});
 
+
+
   constructor() {
     this.connect();
   }
