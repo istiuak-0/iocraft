@@ -1,4 +1,4 @@
-import { getCurrentInstance, inject, onUnmounted, provide } from 'vue';
+import { getCurrentInstance, onUnmounted, provide } from 'vue';
 import { ImplementsUnmounted, type ServiceConstructor } from '../libs/types';
 
 export function exposeToChildren<T extends ServiceConstructor>(classOrInstance: T | InstanceType<T>): void {
@@ -35,8 +35,3 @@ export function exposeToChildren<T extends ServiceConstructor>(classOrInstance: 
   }
 }
 
-export function resolveFromContext<T extends ServiceConstructor>(
-  serviceClass: T
-): InstanceType<T> | undefined {
-  return inject<InstanceType<T>>(serviceClass.name);
-}
