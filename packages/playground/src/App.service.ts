@@ -2,7 +2,7 @@ import { Register, type UnMounted } from '@vuedi/core';
 import { ref } from 'vue';
 
 @Register({
-  in: 'root',
+  in: 'app',
 })
 export class AppService implements UnMounted {
   isUnmounted = ref(false);

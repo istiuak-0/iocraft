@@ -1,7 +1,7 @@
 import { ref } from 'vue';
 import { Register, type UnMounted } from '@vuedi/core';
 
-@Register({ in: 'root' })
+@Register({ in: 'app' })
 export class BinanceService implements UnMounted {
   public socket: WebSocket | null = null;
   public connected = ref(false);

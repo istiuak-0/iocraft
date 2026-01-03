@@ -1,6 +1,6 @@
 import { getCurrentInstance, onUnmounted } from 'vue';
-import { SERVICE_INTERNAL_METADATA, serviceRegistry } from './registry';
-import { ImplementsUnmounted, type ServiceConfig, type ServiceConstructor, type ServiceWithUnmounted } from './types';
+import { SERVICE_INTERNAL_METADATA, serviceRegistry } from '../libs/registry';
+import { ImplementsUnmounted, type ServiceConfig, type ServiceConstructor, type ServiceWithUnmounted } from '../libs/types';
 
 export function resolve<T extends ServiceConstructor>(serviceClass: T): InstanceType<T> {
   let config = (serviceClass as any)[SERVICE_INTERNAL_METADATA] as ServiceConfig;

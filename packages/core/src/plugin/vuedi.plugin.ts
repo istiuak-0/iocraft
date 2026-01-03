@@ -1,6 +1,6 @@
 import type { FunctionPlugin } from 'vue';
-import { serviceRegistry } from './registry';
-import { ImplementsUnmounted, type ServiceConstructor, type ServiceWithUnmounted } from './types';
+import { serviceRegistry } from '../libs/registry';
+import { ImplementsUnmounted, type ServiceConstructor, type ServiceWithUnmounted } from '../libs/types';
 
 type VueDIOptions = {
   services: ServiceConstructor[];
