@@ -1,14 +1,6 @@
 import { getCurrentInstance, onUnmounted } from 'vue';
 import { SERVICE_INTERNAL_METADATA, serviceRegistry } from './registry';
-import type { ServiceConfig, ServiceConstructor } from './types';
-
-function ImplementsUnmounted(instance: unknown) {
-  return typeof (instance as any).onUnmounted === 'function';
-}
-
-type ServiceWithUnmounted<T> = T & {
-  onUnmounted(): void;
-};
+import { ImplementsUnmounted, type ServiceConfig, type ServiceConstructor, type ServiceWithUnmounted } from './types';
 
 export function resolve<T extends ServiceConstructor>(serviceClass: T): InstanceType<T> {
   let config = (serviceClass as any)[SERVICE_INTERNAL_METADATA] as ServiceConfig;
@@ -28,8 +20,6 @@ export function resolve<T extends ServiceConstructor>(serviceClass: T): Instance
     let instance = new serviceClass();
 
     onUnmounted(() => {
-      if (!instance) return;
-
       if (ImplementsUnmounted(instance)) {
         try {
           (instance as ServiceWithUnmounted<typeof instance>).onUnmounted();
@@ -45,16 +35,11 @@ export function resolve<T extends ServiceConstructor>(serviceClass: T): Instance
   }
 
   // For Root scoped Services
-  let instance = serviceRegistry.get(serviceClass);
-
-  if (instance === null) {
-    instance = new serviceClass();
+  if (serviceRegistry.has(serviceClass)) {
+    return serviceRegistry.get(serviceClass) as InstanceType<T>;
+  } else {
+    const instance = new serviceClass();
     serviceRegistry.set(serviceClass, instance);
+    return instance as InstanceType<T>;
   }
-
-  if (!instance) {
-    throw new Error(`Service ${serviceClass.name} not registered`);
-  }
-
-  return instance as InstanceType<T>;
 }
