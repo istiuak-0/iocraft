@@ -6,4 +6,6 @@ export * from './plugin/vuedi.plugin';
 
 export * from './functions/expose-children';
 export * from './functions/resolve-context';
+
+export * from './functions/resolve-scoped';
 export { type UnMounted };
