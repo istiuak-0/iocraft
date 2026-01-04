@@ -1,5 +1,5 @@
 @Register({
-in:'component'| 'app'
+in:'app'
 })
 export class ApiListService {
 private apiList: string[] = [];
@@ -23,12 +23,11 @@ private apiList: string[] = [];
 
   const apiListServiceInstance = resolveInstance(ApiListService); // this will work inside a service or component
 
-  const apiListServiceFromContext = resolveFromContext(ApiListService); // this will work inside a  component only
-  const apiListServiceFactory = resolveFactory(ApiListService); // this will work inside a service or component
+exposeToChildren(ApiListService); // this will work inside a component only
+
+  const apiListServiceFromContext = resolveFromContext(ApiListService); // this will work inside a  component only // gets the instance exposed to children
+
+const apiListServiceScoped = resolveScoped(ApiListService); // this will work inside a component only
 
 
-  apilistservicefactory()
   </script>
-
-
-  

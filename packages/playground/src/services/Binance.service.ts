@@ -1,8 +1,9 @@
 import { ref } from 'vue';
 import { Register, type UnMounted } from '@vuedi/core';
+import { AppService } from '../App.service';
 
 @Register({ in: 'app' })
-export class BinanceService implements UnMounted {
+export class BinanceService extends AppService implements UnMounted {
   public socket: WebSocket | null = null;
   public connected = ref(false);
   public lastMessage = ref<any>({});
@@ -10,6 +11,7 @@ export class BinanceService implements UnMounted {
 
 
   constructor() {
+    super()
     this.connect();
   }
 
@@ -36,7 +38,7 @@ export class BinanceService implements UnMounted {
   }
 
 
-  onUnmounted(): void {
+  override onUnmounted(): void {
     if (this.socket) {
       this.socket.onopen = null;
       this.socket.onmessage = null;

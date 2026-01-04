@@ -16,10 +16,10 @@
     "lint": "pnpm --recursive lint"
   },
   "dependencies": {
-    "vue": "catalog:",
-    "typescript": "catalog:"
+    "vue": "catalog:"
   },
   "devDependencies": {
+    "typescript": "catalog:",
     "rimraf": "^6.0.1"
   },
   "packageManager": "pnpm@10.18.0"

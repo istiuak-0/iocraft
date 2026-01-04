@@ -5,13 +5,14 @@ export type ServiceConfig = {
   in: 'app';
 };
 
-export interface UnMounted {
-  onUnmounted(): void;
-}
-export function ImplementsUnmounted(instance: unknown) {
-  return typeof (instance as any).onUnmounted === 'function';
+export interface Disposable {
+  dispose(): void;
 }
 
-export type ServiceWithUnmounted<T> = T & {
-  onUnmounted(): void;
+export function ImplementsDispose(instance: unknown) {
+  return typeof (instance as any).dispose === 'function';
+}
+
+export type ServiceWithDispose<T> = T & {
+  dispose(): void;
 };

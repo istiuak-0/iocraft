@@ -1,5 +1,5 @@
-import { getCurrentInstance, onUnmounted, provide } from 'vue';
-import { ImplementsUnmounted, type ServiceConstructor } from '../libs/types';
+import { getCurrentInstance, onScopeDispose, provide } from 'vue';
+import { ImplementsDispose, type ServiceConstructor, type ServiceWithDispose } from '../libs/types';
 
 export function exposeToChildren<T extends ServiceConstructor>(classOrInstance: T | InstanceType<T>): void {
   let instance: any;
@@ -20,10 +20,10 @@ export function exposeToChildren<T extends ServiceConstructor>(classOrInstance: 
     const componentInstance = getCurrentInstance();
 
     if (componentInstance) {
-      onUnmounted(() => {
-        if (ImplementsUnmounted(instance)) {
+      onScopeDispose(() => {
+        if (ImplementsDispose(instance)) {
           try {
-            (instance as any).onUnmounted();
+            (instance as ServiceWithDispose<T>).dispose();
           } catch (error) {
             console.error('Error in context service onUnmounted:', error);
           }
