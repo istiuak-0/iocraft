@@ -2,7 +2,7 @@ export type ServiceConstructor<T = unknown> = {
   new (): T;
 };
 export type ServiceConfig = {
-  in: 'app' | 'component';
+  in: 'app';
 };
 
 export interface UnMounted {
