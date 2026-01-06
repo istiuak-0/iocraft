@@ -1,14 +1,10 @@
 <script setup lang="ts">
-import { exposeToChildren, resolve } from '@vuedi/core';
+import { resolve, serviceToRefs } from '@vuedi/core';
 import { BinanceService } from '../services/Binance.service';
-import { AppService } from '../App.service';
 
 const binanceService = resolve(BinanceService);
 
-const appService = resolve(AppService);
-
-exposeToChildren(appService);
-
+const { connected, socket, lastMessage } = serviceToRefs(binanceService);
 </script>
 
 <template>
@@ -17,23 +13,23 @@ exposeToChildren(appService);
     <article>
       <p>
         <strong>Status:</strong>
-        <span v-if="binanceService.connected">🟢 Connected</span>
+        <span v-if="connected">🟢 Connected</span>
         <span v-else>🔴 Disconnected</span>
       </p>
 
       <p>
         <strong>Socket state:</strong>
-        {{ binanceService.socket?.readyState ?? 'N/A' }}
+        {{ socket?.readyState ?? 'N/A' }}
       </p>
     </article>
 
-    <article v-if="binanceService.lastMessage">
+    <article v-if="lastMessage">
       <header>
         <strong>Last Message</strong>
       </header>
 
       <pre style="max-height: 300px; overflow: auto"
-        >{{ binanceService.lastMessage.value }}
+        >{{ lastMessage }}
       </pre>
     </article>
 
@@ -41,6 +37,6 @@ exposeToChildren(appService);
       <p>Waiting for data…</p>
     </article>
 
-    <button @click="appService.isUnmounted.value = true">Unmount the app</button>
+    <!-- <button @click="appService.isUnmounted.value = true">Unmount the app</button> -->
   </main>
 </template>

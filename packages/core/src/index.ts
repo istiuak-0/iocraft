@@ -1,10 +1,10 @@
-import { type Disposable } from './libs/types';
 export * from './decorators/register';
+export * from './functions/expose-children';
 export * from './functions/resolve';
+export * from './functions/resolve-context';
 export * from './functions/resolve-instance';
+export * from './functions/service-to-refs';
+export * from './libs/registry';
+export * from './libs/types';
 export * from './plugin/vuedi.plugin';
 
-export * from './functions/expose-children';
-export * from './functions/resolve-context';
-
-export { type Disposable };

@@ -1,17 +1,13 @@
 import { ref } from 'vue';
-import { Register, type UnMounted } from '@vuedi/core';
-import { AppService } from '../App.service';
+import { Register, type Disposable } from '@vuedi/core';
 
 @Register({ in: 'app' })
-export class BinanceService extends AppService implements UnMounted {
+export class BinanceService implements Disposable {
   public socket: WebSocket | null = null;
   public connected = ref(false);
   public lastMessage = ref<any>({});
 
-
-
   constructor() {
-    super()
     this.connect();
   }
 
@@ -37,8 +33,7 @@ export class BinanceService extends AppService implements UnMounted {
     };
   }
 
-
-  override onUnmounted(): void {
+  dispose(): void {
     if (this.socket) {
       this.socket.onopen = null;
       this.socket.onmessage = null;
@@ -48,20 +43,5 @@ export class BinanceService extends AppService implements UnMounted {
       this.socket.close();
       this.socket = null;
     }
-
-    try {
-      const logs = JSON.parse(localStorage.getItem('binanceServiceLogs') || '[]');
-      logs.push({
-        time: new Date().toISOString(),
-        message: '[BinanceService] onUnmounted ran',
-        connected: this.connected.value,
-        lastMessage: this.lastMessage.value,
-      });
-      localStorage.setItem('binanceServiceLogs', JSON.stringify(logs));
-    } catch (e) {
-      console.error('[BinanceService] Failed to write logs to localStorage', e);
-    }
-
-    console.log('[BinanceService] onUnmounted finished and logged to localStorage');
   }
 }
