@@ -16,11 +16,8 @@
     "lint": "pnpm --recursive lint",
     "prepare": "node scripts/prepare-git-install.js"
   },
-  "dependencies": {
-    "vue": "catalog:"
-  },
   "devDependencies": {
-    "typescript": "catalog:",
+    "typescript": "~5.9.3",
     "rimraf": "^6.0.1"
   },
   "packageManager": "pnpm@10.18.0"

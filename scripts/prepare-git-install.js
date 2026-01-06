@@ -10,7 +10,7 @@ if (isGitRepo) {
 }
 
 try {
-  execSync('npm install', {
+  execSync('npm run i:all', {
     stdio: 'inherit',
     cwd: path.join(__dirname, '..'),
   });
