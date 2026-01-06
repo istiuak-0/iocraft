@@ -3,8 +3,8 @@ export * from './functions/expose-children';
 export * from './functions/resolve';
 export * from './functions/resolve-context';
 export * from './functions/resolve-instance';
-export * from './functions/service-to-refs';
 export * from './libs/registry';
+export * from './libs/service-to-refs';
 export * from './libs/types';
 export * from './plugin/vuedi.plugin';
 

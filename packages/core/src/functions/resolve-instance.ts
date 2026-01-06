@@ -1,5 +1,6 @@
 import { getCurrentInstance, onScopeDispose } from 'vue';
 import { ImplementsDispose, type ServiceConstructor, type ServiceWithDispose } from '../libs/types';
+import { serviceToRefs } from '../libs/service-to-refs';
 
 export function resolveInstance<T extends ServiceConstructor>(serviceClass: T): InstanceType<T> {
   let instance = new serviceClass();
@@ -18,5 +19,5 @@ export function resolveInstance<T extends ServiceConstructor>(serviceClass: T): 
     });
   }
 
-  return instance as InstanceType<T>;
+  return serviceToRefs(instance as object) as InstanceType<T> 
 }

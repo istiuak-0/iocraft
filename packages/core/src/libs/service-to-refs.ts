@@ -16,7 +16,7 @@ export function serviceToRefs<T extends object>(service: T) {
         },
       });
     } else if (isRef(value) || isReactive(value)) {
-      refs[key] = toRef(service, key as any);
+      refs[key] = toRef(service, key);
     }
   }
 

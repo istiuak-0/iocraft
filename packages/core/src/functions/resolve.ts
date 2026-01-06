@@ -1,4 +1,5 @@
 import { SERVICE_INTERNAL_METADATA, serviceRegistry } from '../libs/registry';
+import { serviceToRefs } from '../libs/service-to-refs';
 import { type ServiceConfig, type ServiceConstructor } from '../libs/types';
 
 /// this will only be used fro global services
@@ -18,18 +19,5 @@ export function resolve<T extends ServiceConstructor>(serviceClass: T): Instance
     serviceRegistry.set(serviceClass, instance);
   }
 
-  return new Proxy(instance as object, {
-    get(target: any, prop: string | symbol) {
-      const value = target[prop];
-      if (typeof value === 'function') {
-        return value.bind(target);
-      }
-
-      if (value && typeof value === 'object' && 'value' in value) {
-        return value;
-      }
-
-      return value;
-    },
-  }) as InstanceType<T>;
+  return serviceToRefs(instance as object) as InstanceType<T>;
 }
