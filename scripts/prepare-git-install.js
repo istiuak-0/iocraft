@@ -10,12 +10,12 @@ if (isGitRepo) {
 }
 
 try {
-  execSync('pnpm install', {
+  execSync('npm install', {
     stdio: 'inherit',
     cwd: path.join(__dirname, '..'),
   });
 
-  execSync('pnpm core:build', {
+  execSync('npm run core:build', {
     stdio: 'inherit',
     cwd: path.join(__dirname, '..'),
   });
