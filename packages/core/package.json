@@ -60,9 +60,9 @@
     "globals": "^17.0.0",
     "jiti": "^2.6.1",
     "tsup": "^8.5.1",
-    "typescript": "catalog:",
+    "typescript": "^3.5.26",
     "vitest": "^4.0.16",
-    "vue": "catalog:"
+    "vue": "^3.5.26"
   },
   "engines": {
     "node": ">=18.0.0"

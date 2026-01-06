@@ -14,7 +14,7 @@
     "typecheck": "pnpm --recursive typecheck",
     "core:test": "pnpm --filter @vuedi/core  test",
     "lint": "pnpm --recursive lint",
-    "prepare": "pnpm core:build"
+    "prepare": "pnpm core:build && cp -r packages/core/dist . && cp packages/core/package.json ."
   },
   "dependencies": {
     "vue": "catalog:"
