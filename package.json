@@ -14,7 +14,7 @@
     "typecheck": "pnpm --recursive typecheck",
     "core:test": "pnpm --filter @vuedi/core  test",
     "lint": "pnpm --recursive lint",
-    "prepare": "[ -d .git ] && echo 'Development mode' || cp packages/core/package.json ./package.json"
+    "prepare": "node scripts/prepare-git-install.js"
   },
   "dependencies": {
     "vue": "catalog:"
