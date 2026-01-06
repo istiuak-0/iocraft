@@ -1,7 +1,7 @@
 const fs = require('fs');
 const path = require('path');
+const { execSync } = require('child_process');
 
-// Check if .git folder exists (development mode)
 const isGitRepo = fs.existsSync(path.join(__dirname, '..', '.git'));
 
 if (isGitRepo) {
@@ -9,17 +9,33 @@ if (isGitRepo) {
   process.exit(0);
 }
 
-
-const sourcePath = path.join(__dirname, '..', 'packages', 'core', 'package.json');
-const destPath = path.join(__dirname, '..', 'package.json');
-
 try {
-  const packageJson = JSON.parse(fs.readFileSync(sourcePath, 'utf8'));
+  execSync('pnpm install', {
+    stdio: 'inherit',
+    cwd: path.join(__dirname, '..'),
+  });
+
+  execSync('pnpm core:build', {
+    stdio: 'inherit',
+    cwd: path.join(__dirname, '..'),
+  });
+
+  const packageJson = JSON.parse(
+    fs.readFileSync(path.join(__dirname, '..', 'packages', 'core', 'package.json'), 'utf8')
+  );
   packageJson.name = 'vuedi';
-  fs.writeFileSync(destPath, JSON.stringify(packageJson, null, 2));
-  
-  console.log('Copied and renamed package.json to "vuedi" for git installation');
+
+  const distSource = path.join(__dirname, '..', 'packages', 'core', 'dist');
+  const distDest = path.join(__dirname, '..', 'dist');
+
+  if (fs.existsSync(distSource)) {
+    fs.cpSync(distSource, distDest, { recursive: true });
+  }
+
+  fs.writeFileSync(path.join(__dirname, '..', 'package.json'), JSON.stringify(packageJson, null, 2));
+
+  console.log('Build complete - vuedi ready for use');
 } catch (error) {
-  console.error('Failed to prepare package.json:', error.message);
+  console.error('Build failed:', error.message);
   process.exit(1);
 }
