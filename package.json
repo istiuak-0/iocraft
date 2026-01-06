@@ -1,5 +1,5 @@
 {
-  "name": "@vuedi/root",
+  "name": "vuedi",
   "description": "Monorepo for Vue Dependency Injection (DI) libraries",
   "private": true,
   "workspaces": [
@@ -13,7 +13,8 @@
     "playground:dev": "pnpm --filter @vuedi/playground dev",
     "typecheck": "pnpm --recursive typecheck",
     "core:test": "pnpm --filter @vuedi/core  test",
-    "lint": "pnpm --recursive lint"
+    "lint": "pnpm --recursive lint",
+    "prepare": "pnpm core:build"
   },
   "dependencies": {
     "vue": "catalog:"
