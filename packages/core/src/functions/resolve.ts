@@ -7,17 +7,17 @@ export function resolve<T extends ServiceConstructor>(serviceClass: T): Instance
   let config = (serviceClass as any)[SERVICE_INTERNAL_METADATA] as ServiceConfig;
 
   if (!config) {
-    throw new Error('No Config Metadate Found, Make Sure To Use @Register() in global Service Classes');
+    throw new Error('No Config Meta date Found, Make Sure To Use @Register() in global Service Classes');
   }
 
   let instance: InstanceType<T>;
 
   if (serviceRegistry.has(serviceClass)) {
-    instance = serviceRegistry.get(serviceClass) as InstanceType<T>;
+    instance = serviceRegistry.get(serviceClass) as InstanceType<T>;;
   } else {
     instance = new serviceClass() as InstanceType<T>;
     serviceRegistry.set(serviceClass, instance);
   }
 
-  return getServiceRef(instance as object) as InstanceType<T>;
+  return getServiceRef(instance)
 }

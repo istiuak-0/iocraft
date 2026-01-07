@@ -1,6 +1,5 @@
-export type ServiceConstructor<T = unknown> = {
-  new (): T;
-};
+export type ServiceConstructor<T extends object = object> = new (...args: any[]) => T;
+
 export type ServiceConfig = {
   in: 'app';
 };

@@ -1,22 +1,24 @@
 import { getCurrentInstance, onScopeDispose, provide } from 'vue';
 import { ImplementsDispose, type ServiceConstructor, type ServiceWithDispose } from '../libs/types';
+import { getServiceRef } from '../libs/service-refs';
+import { serviceRefView } from '../libs/registry';
 
 export function exposeToChildren<T extends ServiceConstructor>(classOrInstance: T | InstanceType<T>): void {
   let instance: any;
-  let shouldCleanUp = false;
+  let ownsInstance = false;
 
   if (typeof classOrInstance === 'function') {
     instance = new (classOrInstance as T)();
-    shouldCleanUp = true;
+    ownsInstance = true;
   } else {
-    // No need to clean up here
     instance = classOrInstance;
   }
 
-  const constructor = instance.constructor as ServiceConstructor;
-  provide(constructor.name, instance);
+  const refView = getServiceRef(instance) as InstanceType<T>;
 
-  if (shouldCleanUp) {
+  provide(instance.constructor, refView);
+
+  if (ownsInstance) {
     const componentInstance = getCurrentInstance();
 
     if (componentInstance) {
@@ -28,10 +30,12 @@ export function exposeToChildren<T extends ServiceConstructor>(classOrInstance: 
             console.error('Error in context service onUnmounted:', error);
           }
         }
+
+        if (serviceRefView.has(instance)) {
+          serviceRefView.delete(instance);
+        }
         instance = null;
       });
     }
-
   }
 }
-

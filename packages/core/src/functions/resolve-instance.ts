@@ -21,9 +21,10 @@ export function resolveInstance<T extends ServiceConstructor>(serviceClass: T): 
         serviceRefView.delete(instance as object);
       }
 
+      //@ts-ignore
       instance = null;
     });
   }
 
-  return getServiceRef(instance as object) as InstanceType<T>;
+  return getServiceRef(instance) as InstanceType<T>;
 }
