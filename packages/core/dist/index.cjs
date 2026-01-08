@@ -76,6 +76,8 @@ function serviceToRefs(service) {
       });
     } else if ((0, import_vue.isRef)(value) || (0, import_vue.isReactive)(value)) {
       refs[key] = (0, import_vue.toRef)(service, key);
+    } else {
+      refs[key] = value;
     }
   }
   return refs;
