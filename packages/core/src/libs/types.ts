@@ -1,8 +1,4 @@
-export type ServiceConstructor<T extends object = object> = new (...args: any[]) => T;
-
-export type ServiceConfig = {
-  in: 'app';
-};
+export type ServiceConstructor<T extends object = object> = new () => T;
 
 export interface Disposable {
   dispose(): void;
@@ -14,4 +10,8 @@ export function ImplementsDispose(instance: unknown) {
 
 export type ServiceWithDispose<T> = T & {
   dispose(): void;
+};
+
+export type ServiceMetadata = {
+  token: symbol;
 };

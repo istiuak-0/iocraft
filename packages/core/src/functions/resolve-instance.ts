@@ -4,10 +4,12 @@ import { serviceRefView } from '../libs/registry';
 import { getServiceRef } from '../libs/service-refs';
 
 export function resolveInstance<T extends ServiceConstructor>(serviceClass: T): InstanceType<T> {
+
   let instance = new serviceClass();
   const componentInstance = getCurrentInstance();
 
   if (componentInstance) {
+
     onScopeDispose(() => {
       if (ImplementsDispose(instance)) {
         try {
@@ -21,8 +23,6 @@ export function resolveInstance<T extends ServiceConstructor>(serviceClass: T): 
         serviceRefView.delete(instance as object);
       }
 
-      //@ts-ignore
-      instance = null;
     });
   }
 
