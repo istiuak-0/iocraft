@@ -53,6 +53,16 @@ function getServiceRef(instance) {
   return refs;
 }
 
+// src/libs/service-token.ts
+function getServiceToken(target) {
+  const ctor = typeof target === "function" ? target : target.constructor;
+  const meta = ctor[SERVICE_INTERNAL_METADATA];
+  if (!meta?.token) {
+    throw new Error(`[VUE DI]: ${ctor?.name || "Unknown"} is not decorated with @Register()`);
+  }
+  return meta.token;
+}
+
 // src/functions/expose-children.ts
 function exposeToChildren(classOrInstance) {
   let instance;
@@ -64,7 +74,8 @@ function exposeToChildren(classOrInstance) {
     instance = classOrInstance;
   }
   const refView = getServiceRef(instance);
-  provide(instance.constructor, refView);
+  const serviceToken = getServiceToken(instance);
+  provide(serviceToken, refView);
   if (ownsInstance) {
     const componentInstance = getCurrentInstance();
     if (componentInstance) {
@@ -73,13 +84,12 @@ function exposeToChildren(classOrInstance) {
           try {
             instance.dispose();
           } catch (error) {
-            console.error("Error in context service onUnmounted:", error);
+            console.error("[VUE DI]: Error in scope dispose:", error);
           }
         }
         if (serviceRefView.has(instance)) {
           serviceRefView.delete(instance);
         }
-        instance = null;
       });
     }
   }
@@ -87,11 +97,7 @@ function exposeToChildren(classOrInstance) {
 
 // src/functions/resolve.ts
 function resolve(serviceClass) {
-  const config = serviceClass[SERVICE_INTERNAL_METADATA];
-  if (!config) {
-    throw new Error("[VUE DI]: No Config Meta date Found, Make Sure To Use @Register() Service Classes");
-  }
-  const serviceToken = config.token;
+  const serviceToken = getServiceToken(serviceClass);
   let instance;
   if (serviceRegistry.has(serviceToken)) {
     instance = serviceRegistry.get(serviceToken);
@@ -105,7 +111,8 @@ function resolve(serviceClass) {
 // src/functions/resolve-context.ts
 import { inject } from "vue";
 function resolveFromContext(serviceClass) {
-  return inject(serviceClass.name);
+  const serviceToken = getServiceToken(serviceClass);
+  return inject(serviceToken);
 }
 
 // src/functions/resolve-instance.ts
@@ -119,7 +126,7 @@ function resolveInstance(serviceClass) {
         try {
           instance.dispose();
         } catch (error) {
-          console.error("Error in scope dispose:", error);
+          console.error("[VUE DI]: Error in scope dispose:", error);
         }
       }
       if (serviceRefView.has(instance)) {
@@ -134,9 +141,10 @@ function resolveInstance(serviceClass) {
 var vuediPlugin = (_app, options) => {
   if (options?.services) {
     options.services.forEach((item) => {
-      const serviceInstance = serviceRegistry.has(item);
+      const serviceToken = getServiceToken(item);
+      const serviceInstance = serviceRegistry.has(serviceToken);
       if (!serviceInstance) {
-        serviceRegistry.set(item, new item());
+        serviceRegistry.set(serviceToken, new item());
       }
     });
   }
