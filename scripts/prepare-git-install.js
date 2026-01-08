@@ -8,17 +8,44 @@ if (isGitRepo) {
   process.exit(0);
 }
 
-const sourcePath = path.join(__dirname, '..', 'packages', 'core', 'package.json');
-const destPath = path.join(__dirname, '..', 'package.json');
+const rootDir = path.join(__dirname, '..');
+const coreDir = path.join(rootDir, 'packages', 'core');
+const sourcePackageJson = path.join(coreDir, 'package.json');
+const destPackageJson = path.join(rootDir, 'package.json');
+const sourceDist = path.join(coreDir, 'dist');
+const destDist = path.join(rootDir, 'dist');
+
+function copyDirRecursive(src, dest) {
+  if (!fs.existsSync(src)) {
+    throw new Error(`Source directory does not exist: ${src}`);
+  }
+
+  fs.mkdirSync(dest, { recursive: true });
+
+  const entries = fs.readdirSync(src, { withFileTypes: true });
+  for (const entry of entries) {
+    const srcPath = path.join(src, entry.name);
+    const destPath = path.join(dest, entry.name);
+
+    if (entry.isDirectory()) {
+      copyDirRecursive(srcPath, destPath);
+    } else {
+      fs.copyFileSync(srcPath, destPath);
+    }
+  }
+}
 
 try {
-  const packageJson = JSON.parse(fs.readFileSync(sourcePath, 'utf8'));
+  const packageJson = JSON.parse(fs.readFileSync(sourcePackageJson, 'utf8'));
   packageJson.name = 'vuedi';
+  fs.writeFileSync(destPackageJson, JSON.stringify(packageJson, null, 2));
 
-  fs.writeFileSync(destPath, JSON.stringify(packageJson, null, 2));
+  copyDirRecursive(sourceDist, destDist);
 
-  console.log('Copied and renamed package.json to "vuedi" for git installation');
+  console.log('Prepared for git installation:');
+  console.log(`   - Copied ${sourcePackageJson} → ${destPackageJson} (renamed to "vuedi")`);
+  console.log(`   - Copied ${sourceDist} → ${destDist}`);
 } catch (error) {
-  console.error('Failed to prepare package.json:', error.message);
+  console.error('Failed to prepare package for git installation:', error.message);
   process.exit(1);
 }

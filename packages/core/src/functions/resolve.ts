@@ -1,16 +1,11 @@
-import { SERVICE_INTERNAL_METADATA, serviceRegistry } from '../libs/registry';
+import { serviceRegistry } from '../libs/registry';
 import { getServiceRef } from '../libs/service-refs';
-import { type ServiceConstructor, type ServiceMetadata } from '../libs/types';
+import { getServiceToken } from '../libs/service-token';
+import { type ServiceConstructor, } from '../libs/types';
 
 /// this will only be used fro global services
 export function resolve<T extends ServiceConstructor>(serviceClass: T): InstanceType<T> {
-  const config = (serviceClass as any)[SERVICE_INTERNAL_METADATA] as ServiceMetadata;
-
-  if (!config) {
-    throw new Error('[VUE DI]: No Config Meta date Found, Make Sure To Use @Register() Service Classes');
-  }
-
-  const serviceToken = config.token;
+  const serviceToken = getServiceToken(serviceClass);
   let instance: InstanceType<T>;
 
   if (serviceRegistry.has(serviceToken)) {

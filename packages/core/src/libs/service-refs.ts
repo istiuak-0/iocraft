@@ -31,3 +31,4 @@ export function getServiceRef<T extends InstanceType<ServiceConstructor>>(instan
   serviceRefView.set(instance, refs);
   return refs;
 }
+
