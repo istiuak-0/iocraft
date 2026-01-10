@@ -1,9 +1,66 @@
+import type { ServiceConstructor } from './types';
+
 function hasKey(obj: any, key: string | symbol): boolean {
   if (typeof key === 'symbol') {
     return Object.getOwnPropertySymbols(obj).includes(key);
   }
-  return Object.hasOwn(obj, key)
+  return Object.hasOwn(obj, key);
 }
+
+
+/**
+ * Copies static members (methods, accessors, and properties) from a service class
+ * to the resolved object, preserving correct context and reactivity.
+ *
+ * @template {object} T 
+ * @param {ServiceConstructor<T>} serviceClass 
+ * @param {Record<PropertyKey, unknown>} targetObj 
+ */
+export function addStaticProperties<T extends object>(
+  serviceClass: ServiceConstructor<T>,
+  targetObj: Record<PropertyKey, unknown>
+): void {
+  const allStaticKeys = Object.getOwnPropertyNames(serviceClass);
+
+  const userDefinedStaticKeys = allStaticKeys.filter(key => !['length', 'name', 'prototype'].includes(key));
+
+  userDefinedStaticKeys.forEach(key => {
+    const descriptor = Object.getOwnPropertyDescriptor(serviceClass, key)!;
+
+    if (typeof descriptor.value === 'function') {
+      targetObj[key] = descriptor.value.bind(serviceClass);
+    } else if (descriptor.get || descriptor.set) {
+      const newDesc: PropertyDescriptor = {
+        enumerable: true,
+        configurable: true,
+      };
+
+      if (descriptor.get) {
+        newDesc.get = () => descriptor.get!.call(serviceClass);
+      }
+
+      if (descriptor.set) {
+        newDesc.set = (value: any) => descriptor.set!.call(serviceClass, value);
+      }
+
+      Object.defineProperty(targetObj, key, newDesc);
+    } else {
+      Object.defineProperty(targetObj, key, {
+        get() {
+          return serviceClass[key as keyof typeof serviceClass];
+        },
+        set(value: unknown) {
+          (serviceClass[key as keyof typeof serviceClass] as unknown) = value;
+        },
+        enumerable: true,
+        configurable: true,
+      });
+    }
+  });
+}
+
+
+
 
 
 
@@ -21,14 +78,12 @@ export function resolve(serviceClass: any) {
   const ownStatics = staticKeys.filter(key => !['length', 'name', 'prototype'].includes(key));
 
   ownStatics.forEach(key => {
-
     const descriptor = Object.getOwnPropertyDescriptor(serviceClass, key)!;
 
     if (typeof descriptor.value === 'function') {
       /// Static Methods :: Binding to the class
       getterObj[key] = descriptor.value.bind(serviceClass);
     } else if (descriptor.get || descriptor.set) {
-
       /// Static Getters/Setters :: Attaching to new Getter/Setter
 
       const newDesc: PropertyDescriptor = {
@@ -73,7 +128,7 @@ export function resolve(serviceClass: any) {
     const filteredKeys = protoKeys.filter(key => key !== 'constructor');
 
     filteredKeys.forEach(key => {
-      if (hasKey(getterObj,key)) return;
+      if (hasKey(getterObj, key)) return;
 
       const descriptor = Object.getOwnPropertyDescriptor(currentProto, key)!;
 
@@ -115,7 +170,7 @@ export function resolve(serviceClass: any) {
     const symbolKeys = Object.getOwnPropertySymbols(currentProto);
 
     symbolKeys.forEach(key => {
-      if (hasKey(getterObj,key)) return;
+      if (hasKey(getterObj, key)) return;
 
       const descriptor = Object.getOwnPropertyDescriptor(currentProto, key)!;
 
@@ -160,7 +215,6 @@ export function resolve(serviceClass: any) {
   const instanceKeys = Object.keys(instance);
 
   instanceKeys.forEach(key => {
-
     Object.defineProperty(getterObj, key, {
       get() {
         return instance[key];
@@ -218,11 +272,6 @@ export function resolve(serviceClass: any) {
   });
 
   const instanceSymbolKeys = Object.getOwnPropertySymbols(instance);
-
-
-
-
-
 
   instanceSymbolKeys.forEach(key => {
     Object.defineProperty(getterObj, key, {

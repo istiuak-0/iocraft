@@ -1,7 +1,7 @@
 import type { FunctionPlugin } from 'vue';
-import { serviceRegistry } from '../libs/registry';
-import type { ServiceConstructor } from '../libs/types';
-import { getServiceToken } from '../libs/service-token';
+import { serviceRegistry } from './libs/registry';
+import { getServiceToken } from './libs/service-token';
+import type { ServiceConstructor } from './libs/types';
 
 type VueDIOptions = {
   services: ServiceConstructor[];

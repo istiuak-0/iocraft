@@ -1,5 +1,5 @@
-import { SERVICE_INTERNAL_METADATA } from '../libs/registry';
-import type { ServiceConstructor } from '../libs/types';
+import { SERVICE_INTERNAL_METADATA } from './libs/registry';
+import type { ServiceConstructor } from './libs/types';
 
 export function Register() {
   return function <C extends ServiceConstructor>(constructor: C) {
