@@ -146,28 +146,16 @@ export function addInstanceProperties<T extends object>(
 
 
 
-
-
-
-export function resolve(serviceClass: any) {
-  const instance = new serviceClass();
-  const getterObj: any = {};
-  /*  --- --- Logics For Handling Instance Properties --- ---  */
-
-  /* --- --- Logics For Handling Symbol Properties   */
-
-  /// Static Symbols
-
-  const staticSymbolKeys = Object.getOwnPropertySymbols(serviceClass);
+export function addStaticSymbols<T extends object>(serviceClass:ServiceConstructor<T>,targeObj: Record<PropertyKey, unknown>) {
+    const staticSymbolKeys = Object.getOwnPropertySymbols(serviceClass);
 
   staticSymbolKeys.forEach(key => {
     const descriptor = Object.getOwnPropertyDescriptor(serviceClass, key)!;
 
     if (typeof descriptor.value === 'function') {
-      /// Static Symbol Methods :: Binding to the class
-      getterObj[key] = descriptor.value.bind(serviceClass);
+      targeObj[key] = descriptor.value.bind(serviceClass);
+
     } else if (descriptor.get || descriptor.set) {
-      /// Static Symbol Getters/Setters :: Attaching to new Getter/Setter
       const newDesc: PropertyDescriptor = {
         enumerable: true,
         configurable: true,
@@ -181,22 +169,34 @@ export function resolve(serviceClass: any) {
         newDesc.set = (value: any) => descriptor.set!.call(serviceClass, value);
       }
 
-      Object.defineProperty(getterObj, key, newDesc);
-    } else {
-      /// Static Symbol Properties :: Creating Live Getters
+      Object.defineProperty(targeObj, key, newDesc);
 
-      Object.defineProperty(getterObj, key, {
+    } else {
+      Object.defineProperty(targeObj, key, {
         get() {
-          return serviceClass[key];
+          return serviceClass[key as keyof typeof serviceClass];
         },
         set(v) {
-          serviceClass[key] = v;
+          (serviceClass[key as keyof typeof serviceClass] as unknown) = v;
         },
         enumerable: true,
         configurable: true,
       });
     }
   });
+}
+
+
+export function resolve(serviceClass: any) {
+  const instance = new serviceClass();
+  const getterObj: any = {};
+  /*  --- --- Logics For Handling Instance Properties --- ---  */
+
+  /* --- --- Logics For Handling Symbol Properties   */
+
+  /// Static Symbols
+
+
 
   const instanceSymbolKeys = Object.getOwnPropertySymbols(instance);
 
