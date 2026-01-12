@@ -55,8 +55,8 @@ export function addStaticProperties<T extends object>(
         get() {
           return serviceClass[key as keyof typeof serviceClass];
         },
-        set(value: unknown) {
-          (serviceClass[key as keyof typeof serviceClass] as unknown) = value;
+        set(v) {
+          (serviceClass[key as keyof typeof serviceClass] as unknown) = v;
         },
         enumerable: true,
         configurable: true,
@@ -112,7 +112,7 @@ export function addPrototypeProperties<T extends object>(
             return serviceInstance[key as keyof typeof serviceInstance];
           },
           set(v) {
-            (serviceInstance[key as keyof typeof serviceInstance] as unknown) = v;
+            serviceInstance[key as keyof typeof serviceInstance] = v;
           },
           enumerable: true,
           configurable: true,
@@ -124,26 +124,35 @@ export function addPrototypeProperties<T extends object>(
   }
 }
 
+export function addInstanceProperties<T extends object>(
+  serviceInstance: InstanceType<ServiceConstructor<T>>,
+  targeObj: Record<PropertyKey, unknown>
+) {
+  const instanceKeys = Object.keys(serviceInstance);
+
+  instanceKeys.forEach(key => {
+    Object.defineProperty(targeObj, key, {
+      get() {
+        return serviceInstance[key as keyof typeof serviceInstance];
+      },
+      set(v) {
+        serviceInstance[key as keyof typeof serviceInstance] = v;
+      },
+      enumerable: true,
+      configurable: true,
+    });
+  });
+}
+
+
+
+
 
 
 export function resolve(serviceClass: any) {
   const instance = new serviceClass();
   const getterObj: any = {};
   /*  --- --- Logics For Handling Instance Properties --- ---  */
-  const instanceKeys = Object.keys(instance);
-
-  instanceKeys.forEach(key => {
-    Object.defineProperty(getterObj, key, {
-      get() {
-        return instance[key];
-      },
-      set(v) {
-        instance[key] = v;
-      },
-      enumerable: true,
-      configurable: true,
-    });
-  });
 
   /* --- --- Logics For Handling Symbol Properties   */
 
