@@ -18,6 +18,7 @@ function hasKey(obj: Record<PropertyKey, unknown>, key: PropertyKey): boolean {
  * Copies static members (methods, accessors, and properties) from a service class
  * to the resolved object, preserving correct context and reactivity.
  *
+ * @export
  * @template {object} T
  * @param {ServiceConstructor<T>} serviceClass
  * @param {Record<PropertyKey, unknown>} targetObj
@@ -67,8 +68,9 @@ export function addStaticProperties<T extends object>(
 
 /**
  *  Copies All Prototype members (methods, accessors, and properties) from a object ( service instance )
- *  to the resolved object, preserving correct context and reactivity.
+ *  to the resolved object .
  *
+ * @export
  * @template {object} T
  * @param {InstanceType<ServiceConstructor<T>>} serviceInstance
  * @param {Record<PropertyKey, unknown>} targetObj
@@ -124,6 +126,15 @@ export function addPrototypeProperties<T extends object>(
   }
 }
 
+/**
+ *  Copies All object properties
+ *  to the resolved object .
+ *
+ * @export
+ * @template {object} T
+ * @param {InstanceType<ServiceConstructor<T>>} serviceInstance
+ * @param {Record<PropertyKey, unknown>} targeObj
+ */
 export function addInstanceProperties<T extends object>(
   serviceInstance: InstanceType<ServiceConstructor<T>>,
   targeObj: Record<PropertyKey, unknown>
@@ -144,17 +155,26 @@ export function addInstanceProperties<T extends object>(
   });
 }
 
-
-
-export function addStaticSymbols<T extends object>(serviceClass:ServiceConstructor<T>,targeObj: Record<PropertyKey, unknown>) {
-    const staticSymbolKeys = Object.getOwnPropertySymbols(serviceClass);
+/**
+ *  Copies All static symbols
+ *  to the resolved object .
+ *
+ * @export
+ * @template {object} T
+ * @param {ServiceConstructor<T>} serviceClass
+ * @param {Record<PropertyKey, unknown>} targeObj
+ */
+export function addStaticSymbols<T extends object>(
+  serviceClass: ServiceConstructor<T>,
+  targeObj: Record<PropertyKey, unknown>
+) {
+  const staticSymbolKeys = Object.getOwnPropertySymbols(serviceClass);
 
   staticSymbolKeys.forEach(key => {
     const descriptor = Object.getOwnPropertyDescriptor(serviceClass, key)!;
 
     if (typeof descriptor.value === 'function') {
       targeObj[key] = descriptor.value.bind(serviceClass);
-
     } else if (descriptor.get || descriptor.set) {
       const newDesc: PropertyDescriptor = {
         enumerable: true,
@@ -170,7 +190,6 @@ export function addStaticSymbols<T extends object>(serviceClass:ServiceConstruct
       }
 
       Object.defineProperty(targeObj, key, newDesc);
-
     } else {
       Object.defineProperty(targeObj, key, {
         get() {
@@ -186,32 +205,31 @@ export function addStaticSymbols<T extends object>(serviceClass:ServiceConstruct
   });
 }
 
-
-export function resolve(serviceClass: any) {
-  const instance = new serviceClass();
-  const getterObj: any = {};
-  /*  --- --- Logics For Handling Instance Properties --- ---  */
-
-  /* --- --- Logics For Handling Symbol Properties   */
-
-  /// Static Symbols
-
-
-
-  const instanceSymbolKeys = Object.getOwnPropertySymbols(instance);
+/**
+ *  Copies All object Symbols
+ *  to the resolved object
+ *
+ * @export
+ * @template {object} T
+ * @param {InstanceType<ServiceConstructor<T>>} serviceInstance
+ * @param {Record<PropertyKey, unknown>} targetObj
+ */
+export function addInstanceSymbols<T extends object>(
+  serviceInstance: InstanceType<ServiceConstructor<T>>,
+  targetObj: Record<PropertyKey, unknown>
+) {
+  const instanceSymbolKeys = Object.getOwnPropertySymbols(serviceInstance);
 
   instanceSymbolKeys.forEach(key => {
-    Object.defineProperty(getterObj, key, {
+    Object.defineProperty(targetObj, key, {
       get() {
-        return instance[key];
+        return serviceInstance[key as keyof typeof serviceInstance];
       },
       set(v) {
-        instance[key] = v;
+        serviceInstance[key as keyof typeof serviceInstance] = v;
       },
       enumerable: true,
       configurable: true,
     });
   });
-
-  return getterObj;
 }
