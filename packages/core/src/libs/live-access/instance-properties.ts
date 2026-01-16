@@ -1,5 +1,5 @@
-import { hasKey } from '../has-key';
-import type { ServiceConstructor } from '../types';
+import { hasKey, type ServiceConstructor } from "../utils";
+
 
 /**
  * Copies all own instance properties (including symbols) from a service instance
