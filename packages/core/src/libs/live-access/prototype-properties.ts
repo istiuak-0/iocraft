@@ -13,7 +13,7 @@ export function addPrototypeProperties<T extends object>(
       if (hasKey(targetObj, key)) continue;
 
       if (NATIVE_OBJECT_KEYS.has(key)) {
-        return;
+        continue;
       }
       const descriptor = Object.getOwnPropertyDescriptor(currentProto, key)!;
 

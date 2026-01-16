@@ -2,13 +2,16 @@
 import { resolve } from '@vuedi/core';
 import { CountService } from '../services/Count.service';
 
-const { date, plus, minus } = resolve(CountService);
+const { data, computedData, plus, minus } = resolve(CountService);
 
-console.log(typeof plus);
+
+console.log(plus);
+console.log(minus);
+
 </script>
 <template>
-  <div>{{ date }}</div>
   <button @click="plus()">plus</button>
+  <p>data: {{ data }}</p>
+  <p>computed data : {{ computedData }}</p>
   <button @click="minus()">minus</button>
-  <div>l</div>
 </template>

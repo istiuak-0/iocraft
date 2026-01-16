@@ -1,25 +1,27 @@
-import { Register, resolve } from '@vuedi/core';
+import { Register } from '@vuedi/core';
 import { computed, ref } from 'vue';
 
-@Register()
-export class CountService {
-  date = ref<number>(0);
-  data2 = this.date.value + 2; // this will break
+class BaseService {
+  baseData = ref(100);
+}
 
-  computed = computed(() => {
-    return this.date.value + 4;
-  }); // this will also have some issues
+@Register()
+export class CountService extends BaseService {
+  data = ref<number>(0);
+
+  computedData = computed(() => {
+    return this.data.value + this.baseData.value;
+  });
 
   plus() {
-    console.log('before:', this.date.value);
-    this.date.value++;
-    console.log('after:', this.date.value);
+    console.log('before:', this.data.value);
+    this.data.value++;
+    console.log('after:', this.data.value);
   }
 
   minus() {
-    this.date.value--;
+    console.log('before:', this.data.value);
+    this.data.value--;
+    console.log('after:', this.data.value);
   }
 }
-
-
-

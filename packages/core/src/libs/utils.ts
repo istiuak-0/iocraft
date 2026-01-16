@@ -51,3 +51,6 @@ export type ResolvedService<T extends ServiceConstructor> = {
 } & {
   [K in keyof T]: T[K];
 };
+export type VueDIOptions = {
+  services: ServiceConstructor[];
+};
