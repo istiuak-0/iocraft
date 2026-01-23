@@ -2,9 +2,6 @@
   "name": "@vuedi/root",
   "description": "Monorepo for Vue Dependency Injection (DI) libraries",
   "private": true,
-  "workspaces": [
-    "packages/*"
-  ],
   "scripts": {
     "i:all": "pnpm --recursive install",
     "clean": "find . -name node_modules -type d -exec rm -rf {} + && rm -rf node_modules && pnpm --recursive exec rimraf dist",
@@ -13,8 +10,7 @@
     "playground:dev": "pnpm --filter @vuedi/playground dev",
     "typecheck": "pnpm --recursive typecheck",
     "core:test": "pnpm --filter @vuedi/core  test",
-    "lint": "pnpm --recursive lint",
-    "prepare": "node scripts/prepare-git-install.js"
+    "lint": "pnpm --recursive lint"
   },
   "devDependencies": {
     "typescript": "~5.9.3",
