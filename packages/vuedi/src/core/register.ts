@@ -6,10 +6,9 @@ export function Service(options?: ServiceOptions) {
     if ((constructor as any)[SERVICE_METADATA]?.token) {
       return constructor;
     }
-    const token = Symbol(`[VUE DI]: Service - ${constructor.name || 'Anonymous'}`);
 
     (constructor as any)[SERVICE_METADATA] = {
-      token,
+      token: Symbol(`[VUE DI]: Service - ${constructor.name || 'Anonymous'}`),
       facade: options?.facade ?? true,
     } satisfies ServiceMetadata;
 

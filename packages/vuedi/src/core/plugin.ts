@@ -1,12 +1,9 @@
 import { inject, type FunctionPlugin } from 'vue';
-import type { PluginOptions } from '../utils/core.types';
+import type { PluginOptions, ServiceMetadata } from '../utils/core.types';
 import { getServiceMeta, RootRegistry, SERVICE_METADATA, TempRegistry } from '../utils/core.utils';
 import { ReactiveFacade } from './facade';
 import { routeLocationKey, routerKey } from 'vue-router';
-import { Router } from '../router/Router';
-
-const RouterToken = Symbol('[VUE DI]: vue router instance');
-const RouteToken = Symbol('[VUE DI]: vue route');
+import { RouterService, RouteService } from '../router/Router';
 
 export const VuediPlugin: FunctionPlugin<[Partial<PluginOptions>?]> = (app, options?: Partial<PluginOptions>) => {
   const facade = new ReactiveFacade();
@@ -28,20 +25,30 @@ export const VuediPlugin: FunctionPlugin<[Partial<PluginOptions>?]> = (app, opti
       }
     });
   }
-  app.runWithContext(() => {
-    const router = inject(routerKey);
-    const route = inject(routeLocationKey);
-
-if (route && router) {
-  
-      const routerServiceInstance = new Router(router, route);
-      const meta = (Router as any)[SERVICE_METADATA];
-      RootRegistry.set(meta.token, routerServiceInstance);
-
-}
 
 
+  if (options?.router) {
+    app.runWithContext(() => {
+      const router = inject(routerKey);
+      const route = inject(routeLocationKey);
 
+      if (router && route) {
+        (RouterService as any)[SERVICE_METADATA] = {
+          facade: false,
+          token: Symbol(`[VUE DI]: Service - ${RouterService.name || 'Anonymous'}`),
+        } satisfies ServiceMetadata;
 
-  });
+        (RouteService as any)[SERVICE_METADATA] = {
+          facade: false,
+          token: Symbol(`[VUE DI]: Service - ${RouteService.name || 'Anonymous'}`),
+        } satisfies ServiceMetadata;
+
+        const routerServiceInstance = new RouterService(router);
+        const routeServiceInstance = new RouteService(route);
+
+        RootRegistry.set(getServiceMeta(RouterService).token, routerServiceInstance);
+        RootRegistry.set(getServiceMeta(RouteService).token, routeServiceInstance);
+      }
+    });
+  }
 };

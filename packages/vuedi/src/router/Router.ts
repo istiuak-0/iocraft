@@ -1,6 +1,6 @@
+import type { RouteLocationNormalizedGeneric, Router } from 'vue-router';
 
-
-export class Router {
+export class RouterService {
   constructor(private _router: Router) {
     return new Proxy(this, {
       get(target, prop) {
@@ -18,6 +18,24 @@ export class Router {
       },
     });
   }
-} as Router & VueRouter
+}
 
-export class Route {}
+export class RouteService {
+  constructor(private _route: RouteLocationNormalizedGeneric) {
+    return new Proxy(this, {
+      get(target, prop) {
+        if (prop in target) {
+          return (target as any)[prop];
+        }
+
+        const val = (target._route as any)[prop];
+        
+        if (typeof val === 'function') {
+          return val.bind(target._route);
+        }
+
+        return val;
+      },
+    });
+  }
+}
