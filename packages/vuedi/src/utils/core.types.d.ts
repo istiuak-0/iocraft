@@ -1,3 +1,7 @@
+export type ServiceOptions = {
+  facade?: boolean=true;
+};
+
 export type ServiceWithDispose<T> = T & {
   dispose(): void;
 };
@@ -5,7 +9,6 @@ export type ServiceWithDispose<T> = T & {
 export type ServiceMetadata = {
   token: symbol;
 };
-
 
 export type ResolvedService<T extends ServiceConstructor> = {
   [K in keyof InstanceType<T>]: InstanceType<T>[K];
@@ -15,7 +18,6 @@ export type ResolvedService<T extends ServiceConstructor> = {
 export type VueDIOptions = {
   services: ServiceConstructor[];
 };
-
 
 export type ServiceConstructor<T extends object = object> = new () => T;
 

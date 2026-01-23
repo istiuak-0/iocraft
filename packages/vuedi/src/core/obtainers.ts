@@ -1,7 +1,7 @@
-import { getCurrentInstance, inject, onScopeDispose } from "vue";
-import type { ResolvedService, ServiceConstructor, ServiceWithDispose } from "../utils/core.types";
-import { getServiceToken, ImplementsDispose, serviceRefView, serviceRegistry } from "../utils/core.utils";
-import { addInstanceProperties, addPrototypeProperties, addStaticProperties } from "./reactive-facade";
+import { getCurrentInstance, inject, onScopeDispose } from 'vue';
+import type { ResolvedService, ServiceConstructor, ServiceWithDispose } from '../utils/core.types';
+import { getServiceToken, ImplementsDispose, serviceRefView, serviceRegistry } from '../utils/core.utils';
+import { addInstanceProperties, addPrototypeProperties, addStaticProperties } from './facade';
 
 /**
  * Resolves a global singleton service into a destructurable object with:
@@ -13,7 +13,7 @@ import { addInstanceProperties, addPrototypeProperties, addStaticProperties } fr
  * @param {T} serviceClass
  * @returns {InstanceType<T>}
  */
-export function resolve<T extends ServiceConstructor>(serviceClass: T) {
+export function obtain<T extends ServiceConstructor>(serviceClass: T) {
   const serviceToken = getServiceToken(serviceClass);
 
   // Ensure singleton: create once, reuse forever
@@ -31,12 +31,7 @@ export function resolve<T extends ServiceConstructor>(serviceClass: T) {
   return obj as ResolvedService<T>;
 }
 
-
-
-
-
-
-export function resolveInstance<T extends ServiceConstructor>(serviceClass: T): InstanceType<T> {
+export function obtainNew<T extends ServiceConstructor>(serviceClass: T): InstanceType<T> {
   let instance = new serviceClass();
   const componentInstance = getCurrentInstance();
 
@@ -59,17 +54,12 @@ export function resolveInstance<T extends ServiceConstructor>(serviceClass: T): 
   return instance as InstanceType<T>;
 }
 
-
-
-export function resolveFromContext<T extends ServiceConstructor>(serviceClass: T) {
+export function passed<T extends ServiceConstructor>(serviceClass: T) {
   const serviceToken = getServiceToken(serviceClass);
   return inject<InstanceType<T>>(serviceToken);
 }
 
-
-
-
-export function exposeToChildren<T extends ServiceConstructor>(_classOrInstance: T | InstanceType<T>): void {
+export function pass<T extends ServiceConstructor>(_classOrInstance: T | InstanceType<T>): void {
   // let instance: InstanceType<T>;
   // let ownsInstance = false;
   // if (typeof classOrInstance === 'function') {
