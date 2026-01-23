@@ -1,4 +1,4 @@
-import { hasKey, type ServiceConstructor } from "../utils";
+import { hasKey, type ServiceConstructor } from '../utils';
 
 /**
  * Copies all own static members (including symbols) from a service class

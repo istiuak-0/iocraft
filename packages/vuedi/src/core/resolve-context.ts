@@ -1,5 +1,5 @@
 import { inject } from 'vue';
-import { getServiceToken, type ServiceConstructor } from '../libs/utils';
+import { getServiceToken, type ServiceConstructor } from './utils';
 
 export function resolveFromContext<T extends ServiceConstructor>(serviceClass: T) {
   const serviceToken = getServiceToken(serviceClass);

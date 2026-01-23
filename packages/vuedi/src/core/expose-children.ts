@@ -1,4 +1,4 @@
-import type { ServiceConstructor } from '../libs/utils';
+import type { ServiceConstructor } from './utils';
 
 export function exposeToChildren<T extends ServiceConstructor>(_classOrInstance: T | InstanceType<T>): void {
   // let instance: InstanceType<T>;

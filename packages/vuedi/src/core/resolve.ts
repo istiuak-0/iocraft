@@ -1,9 +1,7 @@
-import { addInstanceProperties } from '../libs/live-access/instance-properties';
-import { addPrototypeProperties } from '../libs/live-access/prototype-properties';
-import { addStaticProperties } from '../libs/live-access/static-properties';
-import { getServiceToken, serviceRegistry, type ResolvedService, type ServiceConstructor } from '../libs/utils';
-
-
+import { addInstanceProperties } from './live-access/instance-properties';
+import { addPrototypeProperties } from './live-access/prototype-properties';
+import { addStaticProperties } from './live-access/static-properties';
+import { getServiceToken, serviceRegistry, type ResolvedService, type ServiceConstructor } from './utils';
 
 /**
  * Resolves a global singleton service into a destructurable object with:

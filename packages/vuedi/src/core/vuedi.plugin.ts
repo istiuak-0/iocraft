@@ -1,5 +1,5 @@
 import type { FunctionPlugin } from 'vue';
-import { getServiceToken, serviceRegistry, type VueDIOptions } from './libs/utils';
+import { getServiceToken, serviceRegistry, type VueDIOptions } from './utils';
 
 export const vuediPlugin: FunctionPlugin<[Partial<VueDIOptions>?]> = (_app, options?: Partial<VueDIOptions>) => {
   ///Eagerly create instances
