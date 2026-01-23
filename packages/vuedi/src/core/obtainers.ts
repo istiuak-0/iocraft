@@ -1,5 +1,5 @@
 import { getCurrentInstance, inject, onScopeDispose } from 'vue';
-import type { FacadeService, ServiceConstructor, ServiceWithDispose } from '../utils/core.types';
+import type { FacadeService, ServiceConstructor } from '../utils/core.types';
 import { getServiceMeta, ImplementsDispose, RootRegistry } from '../utils/core.utils';
 import { ReactiveFacade } from './facade';
 
@@ -35,19 +35,19 @@ export function obtain<T extends ServiceConstructor>(
 
 export function obtainNew<T extends ServiceConstructor>(serviceClass: T): InstanceType<T> {
   let instance = new serviceClass();
-  const componentInstance = getCurrentInstance();
+  // const componentInstance = getCurrentInstance();
 
-  if (componentInstance) {
-    onScopeDispose(() => {
-      if (ImplementsDispose(instance)) {
-        try {
-          (instance as ServiceWithDispose<typeof instance>).dispose();
-        } catch (error) {
-          console.error('[VUE DI]: Error in scope dispose:', error);
-        }
-      }
-    });
-  }
+  // if (componentInstance) {
+  //   onScopeDispose(() => {
+  //     if (ImplementsDispose(instance)) {
+  //       try {
+  //         (instance as ServiceWithDispose<typeof instance>).dispose();
+  //       } catch (error) {
+  //         console.error('[VUE DI]: Error in scope dispose:', error);
+  //       }
+  //     }
+  //   });
+  // }
   return instance as InstanceType<T>;
 }
 
@@ -56,7 +56,7 @@ export function passed<T extends ServiceConstructor>(serviceClass: T) {
   return inject<InstanceType<T>>(serviceMeta.token);
 }
 
-export function pass<T extends ServiceConstructor>(classOrInstance: T | InstanceType<T>): void {
+export function pass<T extends ServiceConstructor>(_classOrInstance: T | InstanceType<T>): void {
   // let instance: InstanceType<T>;
   // let ownsInstance = false;
   // if (typeof classOrInstance === 'function') {

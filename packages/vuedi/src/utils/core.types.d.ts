@@ -1,11 +1,12 @@
+export type ServiceConstructor<T extends object = object> = new () => T;
+
+export type PluginOptions = {
+  EagerLoad: ServiceConstructor[];
+};
+
 export interface ServiceOptions {
   facade?: boolean;
 }
-
-export type ServiceWithDispose<T> = T & {
-  dispose(): void;
-};
-
 export type ServiceMetadata = {
   token: symbol;
   facade: boolean;
@@ -16,12 +17,3 @@ export type FacadeService<T extends ServiceConstructor> = {
 } & {
   [K in keyof T]: T[K];
 };
-export type VueDIOptions = {
-  services: ServiceConstructor[];
-};
-
-export type ServiceConstructor<T extends object = object> = new () => T;
-
-export interface Disposable {
-  dispose(): void;
-}

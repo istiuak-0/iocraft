@@ -1,14 +1,14 @@
 import type { ServiceConstructor, ServiceMetadata, ServiceOptions } from '../utils/core.types';
-import { SERVICE_INTERNAL_METADATA } from '../utils/core.utils';
+import { SERVICE_METADATA } from '../utils/core.utils';
 
 export function Service(options?: ServiceOptions) {
   return function <C extends ServiceConstructor>(constructor: C) {
-    if ((constructor as any)[SERVICE_INTERNAL_METADATA]?.token) {
+    if ((constructor as any)[SERVICE_METADATA]?.token) {
       return constructor;
     }
     const token = Symbol(`[VUE DI]: Service - ${constructor.name || 'Anonymous'}`);
 
-    (constructor as any)[SERVICE_INTERNAL_METADATA] = {
+    (constructor as any)[SERVICE_METADATA] = {
       token,
       facade: options?.facade ?? true,
     } satisfies ServiceMetadata;
