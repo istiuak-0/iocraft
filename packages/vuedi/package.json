@@ -1,5 +1,5 @@
 {
-  "name": "@vuedi/core",
+  "name": "vuedi",
   "version": "0.1.0",
   "description": "A lightweight, type-safe Dependency Injection (DI) container for Vue 3 using the Composition API.",
   "keywords": [
