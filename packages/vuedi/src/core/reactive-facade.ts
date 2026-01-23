@@ -49,6 +49,7 @@ export function addInstanceProperties<T extends object>(
   }
 }
 
+
 /**
  * Copies all own static members (including symbols) from a service class
  * to the target object, preserving correct context and reactivity.
@@ -105,6 +106,7 @@ export function addStaticProperties<T extends object>(
     }
   }
 }
+
 
 /**
  * Copies all own Prototype Properties from a service class

@@ -1,6 +1,5 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import {addStaticProperties} from './../src/libs/live-access'
-import { ServiceConstructor } from '../src/libs/types';
+
 // Type definitions
 
 
