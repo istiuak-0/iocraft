@@ -3,7 +3,9 @@ import type { PluginOptions, ServiceMetadata } from '../utils/core.types';
 import { getServiceMeta, RootRegistry, SERVICE_METADATA, TempRegistry } from '../utils/core.utils';
 import { ReactiveFacade } from './facade';
 import { routeLocationKey, routerKey } from 'vue-router';
-import { RouterService, RouteService } from '../router/Router';
+import { RouterService, RouteService } from '../router';
+
+
 
 export const VuediPlugin: FunctionPlugin<[Partial<PluginOptions>?]> = (app, options?: Partial<PluginOptions>) => {
   const facade = new ReactiveFacade();
@@ -25,7 +27,6 @@ export const VuediPlugin: FunctionPlugin<[Partial<PluginOptions>?]> = (app, opti
       }
     });
   }
-
 
   if (options?.router) {
     app.runWithContext(() => {
