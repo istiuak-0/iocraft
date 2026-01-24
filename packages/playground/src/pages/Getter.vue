@@ -3,12 +3,11 @@
 import { obtain } from 'vuedi';
 import { CountService } from '../services/Count.service';
 
-const servive = obtain(CountService);
-console.log(servive);
+const service = obtain(CountService);
 
 </script>
 <template>
-<p>{{servive}}</p>
+<p>{{service}}</p>
 
 
 

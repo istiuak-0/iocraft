@@ -1,8 +1,8 @@
-import type { FacadeService, ServiceConstructor, ServiceMetadata } from './core.types';
+import type { ServiceConstructor, ServiceMetadata } from './core.types';
 
 export const SERVICE_METADATA = Symbol('VUEDI_SERVICE_METADATA');
 export const RootRegistry = new Map<symbol, object>();
-export const TempRegistry = new Map<symbol, FacadeService<ServiceConstructor>>();
+export const TempRegistry = new Map<symbol, object>();
 
 export function getServiceMeta(target: ServiceConstructor | object) {
   const ctor = typeof target === 'function' ? target : target.constructor;

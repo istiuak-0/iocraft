@@ -33,30 +33,10 @@
       "import": "./dist/core.js",
       "require": "./dist/core.cjs"
     },
-    "./core": {
-      "types": "./dist/core.d.ts",
-      "import": "./dist/core.js",
-      "require": "./dist/core.cjs"
-    },
-    "./router": {
-      "types": "./dist/router.d.ts",
-      "import": "./dist/router.js",
-      "require": "./dist/router.cjs"
-    },
-    "./store": {
-      "types": "./dist/store.d.ts",
-      "import": "./dist/store.js",
-      "require": "./dist/store.cjs"
-    },
-    "./query": {
-      "types": "./dist/query.d.ts",
-      "import": "./dist/query.js",
-      "require": "./dist/query.cjs"
-    },
-    "./utils": {
-      "types": "./dist/utils.d.ts",
-      "import": "./dist/utils.js",
-      "require": "./dist/utils.cjs"
+    "./helpers": {
+      "types": "./dist/helpers.d.ts",
+      "import": "./dist/helpers.js",
+      "require": "./dist/helpers.cjs"
     }
   },
   "files": [

@@ -1,12 +1,22 @@
-import { inject, type FunctionPlugin } from 'vue';
-import type { PluginOptions, ServiceMetadata } from '../utils/core.types';
-import { getServiceMeta, RootRegistry, SERVICE_METADATA, TempRegistry } from '../utils/core.utils';
+import { type FunctionPlugin } from 'vue';
+import type { PluginOptions } from '../utils/core.types';
+import { getServiceMeta, RootRegistry, TempRegistry } from '../utils/core.utils';
 import { ReactiveFacade } from './facade';
-import { routeLocationKey, routerKey } from 'vue-router';
-import { RouterService, RouteService } from '../router';
+import { RouterService } from '../helpers';
 
-export const VuediPlugin: FunctionPlugin<[Partial<PluginOptions>?]> = (app, options?: Partial<PluginOptions>) => {
+export const VuediPlugin: FunctionPlugin<[Partial<PluginOptions>?]> = (_app, options?: Partial<PluginOptions>) => {
   const facade = new ReactiveFacade();
+
+  if (options?.router) {
+    const routerProxy = new Proxy({} as RouterService, {
+      get(_, prop) {
+        const val = (options.router as any)[prop];
+        return typeof val === 'function' ? val.bind(options.router) : val;
+      },
+    });
+    RootRegistry.set(getServiceMeta(RouterService).token, routerProxy);
+  }
+
   ///Eagerly create instances
   if (options?.EagerLoad) {
     options.EagerLoad.forEach(service => {
@@ -22,50 +32,6 @@ export const VuediPlugin: FunctionPlugin<[Partial<PluginOptions>?]> = (app, opti
         if (!TempRegistry.has(serviceMeta.token)) {
           TempRegistry.set(serviceMeta.token, facade.createFacadeObj(service, instance));
         }
-      }
-    });
-  }
-
-  if (options?.router) {
-    app.runWithContext(() => {
-      const router = inject(routerKey);
-      const route = inject(routeLocationKey);
-
-      if (router && route) {
-        if (!(RouterService as any)[SERVICE_METADATA]) {
-          (RouterService as any)[SERVICE_METADATA] = {
-            token: Symbol(`[VUE DI]: Service - ${RouterService.name}`),
-            facade: false,
-          };
-        }
-
-        const routerProxy = new Proxy({} as RouterService, {
-          get(_, prop) {
-            const val = (router as any)[prop];
-            return typeof val === 'function' ? val.bind(router) : val;
-          },
-        });
-
-        if (!(RouteService as any)[SERVICE_METADATA]) {
-          (RouteService as any)[SERVICE_METADATA] = {
-            token: Symbol(`[VUE DI]: Service - ${RouteService.name}`),
-            facade: true,
-          };
-        }
-
-        const routeProxy = new Proxy({} as RouteService, {
-          get(_, prop) {
-            return (route as any)[prop];
-          },
-        });
-
-        (RouteService as any)[SERVICE_METADATA] = {
-          facade: false,
-          token: Symbol(`[VUE DI]: Service - ${RouteService.name || 'Anonymous'}`),
-        } satisfies ServiceMetadata;
-
-        RootRegistry.set(getServiceMeta(RouterService).token, routerProxy);
-        RootRegistry.set(getServiceMeta(RouteService).token, routeProxy);
       }
     });
   }
