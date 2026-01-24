@@ -1,4 +1,5 @@
 export type ServiceConstructor<T extends object = object> = new (...args: any[]) => T;
+export type ServiceView<T extends ServiceConstructor> = InstanceType<T> & T;
 
 export type PluginOptions = {
   EagerLoad: ServiceConstructor[];
@@ -15,8 +16,3 @@ export type ServiceMetadata = {
 };
 
 
-export type FacadeService<T extends ServiceConstructor> = {
-  [K in keyof InstanceType<T>]: InstanceType<T>[K];
-} & {
-  [K in keyof T]: T[K];
-};

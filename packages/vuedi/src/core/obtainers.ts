@@ -1,49 +1,38 @@
-import {  inject } from 'vue';
-import type { FacadeService, ServiceConstructor } from '../utils/core.types';
+import { inject } from 'vue';
+import type { ServiceConstructor, ServiceView } from '../utils/core.types';
 import { getServiceMeta, RootRegistry, TempRegistry } from '../utils/core.utils';
 import { ReactiveFacade } from './facade';
 
 /**
- * Resolves a global singleton service into a destructurable object with:
- * - Live getters for reactive state (ref, computed, etc.)
- * - Bound methods that preserve correct `this` context
+ * Obtains a global singleton service From global service Registry;
+ * And If That Service is not Registered Then Registers It
  *
  * @export
  * @template {ServiceConstructor} T
  * @param {T} serviceClass
  * @param {*} [facade=new ReactiveFacade()]
- * @returns {(InstanceType<T> |  FacadeService<T>)}
+ * @returns {ServiceView<T>}
  */
-export function obtain<T extends ServiceConstructor>(
-  serviceClass: T,
-  facade = new ReactiveFacade()
-): InstanceType<T> | FacadeService<T> {
+export function obtain<T extends ServiceConstructor>(serviceClass: T, facade = new ReactiveFacade()): ServiceView<T> {
   const serviceMeta = getServiceMeta(serviceClass);
 
-  // Ensure singleton: create once, reuse forever
+  // Ensure singleton
   if (!RootRegistry.has(serviceMeta.token)) {
     RootRegistry.set(serviceMeta.token, new serviceClass());
   }
 
-  const instance = RootRegistry.get(serviceMeta.token)!;
+  let instance = RootRegistry.get(serviceMeta.token)!;
 
   if (serviceMeta.facade) {
     if (!TempRegistry.has(serviceMeta.token)) {
       TempRegistry.set(serviceMeta.token, facade.createFacadeObj(serviceClass, instance));
     }
 
-    return TempRegistry.get(serviceMeta.token) as FacadeService<T>;
-  } else {
-    return instance as InstanceType<T>;
+    instance = TempRegistry.get(serviceMeta.token)!;
   }
+
+  return instance as ServiceView<T>;
 }
-
-
-
-
-
-
-
 
 export function obtainNew<T extends ServiceConstructor>(serviceClass: T): InstanceType<T> {
   let instance = new serviceClass();
