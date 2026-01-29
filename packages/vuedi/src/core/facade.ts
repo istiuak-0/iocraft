@@ -166,58 +166,58 @@ export class ReactiveFacade {
     this.addPrototypeProperties(serviceInstance, targetObj);
     return targetObj;
   }
+}
 
-  generateRouterFacade(router: Router): Record<string, any> {
-    return {
-      get path() {
-        return router.currentRoute.value.path;
-      },
-      get name() {
-        return router.currentRoute.value.name;
-      },
-      get params() {
-        return router.currentRoute.value.params;
-      },
-      get query() {
-        return router.currentRoute.value.query;
-      },
-      get hash() {
-        return router.currentRoute.value.hash;
-      },
-      get fullPath() {
-        return router.currentRoute.value.fullPath;
-      },
-      get matched() {
-        return router.currentRoute.value.matched;
-      },
-      get meta() {
-        return router.currentRoute.value.meta;
-      },
-      push: router.push.bind(router),
-      replace: router.replace.bind(router),
-      go: router.go.bind(router),
-      back: router.back.bind(router),
-      forward: router.forward.bind(router),
-      resolve: router.resolve.bind(router),
-      getRoutes: router.getRoutes.bind(router),
-      hasRoute: router.hasRoute.bind(router),
+export function generateRouterFacade(router: Router): Record<string, any> {
+  return {
+    get path() {
+      return router.currentRoute.value.path;
+    },
+    get name() {
+      return router.currentRoute.value.name;
+    },
+    get params() {
+      return router.currentRoute.value.params;
+    },
+    get query() {
+      return router.currentRoute.value.query;
+    },
+    get hash() {
+      return router.currentRoute.value.hash;
+    },
+    get fullPath() {
+      return router.currentRoute.value.fullPath;
+    },
+    get matched() {
+      return router.currentRoute.value.matched;
+    },
+    get meta() {
+      return router.currentRoute.value.meta;
+    },
+    push: router.push.bind(router),
+    replace: router.replace.bind(router),
+    go: router.go.bind(router),
+    back: router.back.bind(router),
+    forward: router.forward.bind(router),
+    resolve: router.resolve.bind(router),
+    getRoutes: router.getRoutes.bind(router),
+    hasRoute: router.hasRoute.bind(router),
 
-      // === Router guards ===
-      beforeEach: router.beforeEach.bind(router),
-      beforeResolve: router.beforeResolve.bind(router),
-      afterEach: router.afterEach.bind(router),
-      onError: router.onError.bind(router),
+    // === Router guards ===
+    beforeEach: router.beforeEach.bind(router),
+    beforeResolve: router.beforeResolve.bind(router),
+    afterEach: router.afterEach.bind(router),
+    onError: router.onError.bind(router),
 
-      // === Dynamic routing ===
-      addRoute: router.addRoute.bind(router),
-      removeRoute: router.removeRoute.bind(router),
-      clearRoutes: router.clearRoutes.bind(router),
+    // === Dynamic routing ===
+    addRoute: router.addRoute.bind(router),
+    removeRoute: router.removeRoute.bind(router),
+    clearRoutes: router.clearRoutes.bind(router),
 
-      // === State ===
-      isReady: router.isReady.bind(router),
-      get currentRoute() {
-        return router.currentRoute;
-      },
-    };
-  }
+    // === State ===
+    isReady: router.isReady.bind(router),
+    get currentRoute() {
+      return router.currentRoute;
+    },
+  };
 }

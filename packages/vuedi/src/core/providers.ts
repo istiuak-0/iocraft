@@ -1,7 +1,7 @@
 import type { ServiceConstructor, ServiceMetadata, ServiceOptions } from '../utils/core.types';
 import { SERVICE_METADATA } from '../utils/core.utils';
 
-export function Service(options?: ServiceOptions) {
+export function Provide(options?: ServiceOptions) {
   return function <C extends ServiceConstructor>(constructor: C) {
     if ((constructor as any)[SERVICE_METADATA]?.token) {
       return constructor;

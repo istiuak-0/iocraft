@@ -1,14 +1,14 @@
 import { type FunctionPlugin } from 'vue';
 import type { PluginOptions } from '../utils/core.types';
 import { getServiceMeta, RootRegistry, TempRegistry } from '../utils/core.utils';
-import { ReactiveFacade } from './facade';
+import { generateRouterFacade, ReactiveFacade } from './facade';
 import { Nav } from '../helpers';
 
 export const VuediPlugin: FunctionPlugin<[Partial<PluginOptions>?]> = (_app, options?: Partial<PluginOptions>) => {
   const facade = new ReactiveFacade();
 
   if (options?.router) {
-    RootRegistry.set(getServiceMeta(Nav).token, facade.generateRouterFacade(options.router));
+    RootRegistry.set(getServiceMeta(Nav).token, generateRouterFacade(options.router));
   }
 
   ///Eagerly create instances

@@ -4,8 +4,7 @@ import { getServiceMeta, RootRegistry, TempRegistry } from '../utils/core.utils'
 import { ReactiveFacade } from './facade';
 
 /**
- * Obtains a global singleton service From global service Registry;
- * And If That Service is not Registered Then Registers It
+ * Injects a global singleton service From Root Registry;
  *
  * @export
  * @template {ServiceConstructor} T
@@ -13,7 +12,7 @@ import { ReactiveFacade } from './facade';
  * @param {*} [facade=new ReactiveFacade()]
  * @returns {ServiceView<T>}
  */
-export function obtain<T extends ServiceConstructor>(serviceClass: T, facade = new ReactiveFacade()): ServiceView<T> {
+export function Inject<T extends ServiceConstructor>(serviceClass: T, facade: any = new ReactiveFacade()): ServiceView<T> {
   const serviceMeta = getServiceMeta(serviceClass);
 
   // Ensure singleton
@@ -34,7 +33,8 @@ export function obtain<T extends ServiceConstructor>(serviceClass: T, facade = n
   return instance as ServiceView<T>;
 }
 
-export function obtainNew<T extends ServiceConstructor>(serviceClass: T): InstanceType<T> {
+
+export function InjectInstance<T extends ServiceConstructor>(serviceClass: T): InstanceType<T> {
   let instance = new serviceClass();
   // const componentInstance = getCurrentInstance();
 
@@ -52,12 +52,12 @@ export function obtainNew<T extends ServiceConstructor>(serviceClass: T): Instan
   return instance as InstanceType<T>;
 }
 
-export function passed<T extends ServiceConstructor>(serviceClass: T) {
+export function InjectFromContext<T extends ServiceConstructor>(serviceClass: T) {
   const serviceMeta = getServiceMeta(serviceClass);
   return inject<InstanceType<T>>(serviceMeta.token);
 }
 
-export function pass<T extends ServiceConstructor>(_classOrInstance: T | InstanceType<T>): void {
+export function ExposeToContext<T extends ServiceConstructor>(_classOrInstance: T | InstanceType<T>): void {
   // let instance: InstanceType<T>;
   // let ownsInstance = false;
   // if (typeof classOrInstance === 'function') {
