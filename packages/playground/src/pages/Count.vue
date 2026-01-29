@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import { obtain } from 'vuedi';
+import { Inject } from 'vuedi';
 import { CountService } from '../services/Count.service';
 import { Nav } from 'vuedi/helpers';
 
-const { data, computedData, plus, minus } = obtain(CountService);
+const { data, computedData, plus, minus } = Inject(CountService);
 
-const { push } = obtain(Nav);
+const { push } = Inject(Nav);
 </script>
 <template>
   <button @click="plus">plus</button>

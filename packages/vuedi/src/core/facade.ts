@@ -124,7 +124,6 @@ export class ReactiveFacade {
    * @param {InstanceType<ServiceConstructor<T>>} serviceInstance
    * @param {Record<PropertyKey, unknown>} targetObj
    */
-
   private addPrototypeProperties<T extends object>(
     serviceInstance: InstanceType<ServiceConstructor<T>>,
     targetObj: Record<PropertyKey, unknown>

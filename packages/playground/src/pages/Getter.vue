@@ -1,14 +1,9 @@
 <script setup lang="ts">
-
-import { obtain } from 'vuedi';
+import { Inject } from 'vuedi';
 import { CountService } from '../services/Count.service';
 
-const service = obtain(CountService);
-
+const service = Inject(CountService);
 </script>
 <template>
-<p>{{service}}</p>
-
-
-
+  <p>{{ service }}</p>
 </template>

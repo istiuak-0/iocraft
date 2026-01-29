@@ -1,8 +1,8 @@
 import { ref } from 'vue';
-import { Service } from 'vuedi';
+import { Provide } from 'vuedi';
 
 
-@Service()
+@Provide()
 export class BinanceService {
   public socket: WebSocket | null = null;
   public connected = ref(false);

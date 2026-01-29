@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { obtain } from 'vuedi';
+import { Inject } from 'vuedi';
 import { BinanceService } from '../services/Binance.service';
 
-const { connected, socket, lastMessage } = obtain(BinanceService);
+const { connected, socket, lastMessage } = Inject(BinanceService);
 </script>
 
 <template>
