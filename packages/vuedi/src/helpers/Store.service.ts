@@ -16,6 +16,16 @@ export function Store<T extends Record<string, any>>(initialState: T) {
       }
     }
 
+    select<K extends keyof T>(key: K): ComputedRef<T[K]> {
+      return computed(() => this.state[key]);
+    }
+
+    computed() {}
+
+    watch() {}
+
+    watchEffect() {}
+
     reset(): void {
       const fresh = initialState;
 
@@ -28,8 +38,8 @@ export function Store<T extends Record<string, any>>(initialState: T) {
       }
     }
 
-    select<K extends keyof T>(key: K): ComputedRef<T[K]> {
-      return computed(() => this.state[key]);
-    }
+    onInit() {}
+
+    onDispose() {}
   };
 }
