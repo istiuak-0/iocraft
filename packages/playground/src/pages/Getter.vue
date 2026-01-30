@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { Inject } from 'vuedi';
-import { CountService } from '../services/Count.service';
+import { CountStore } from '../services/Count.service';
 
-const service = Inject(CountService);
+const service = Inject(CountStore);
 </script>
 <template>
   <p>{{ service }}</p>
