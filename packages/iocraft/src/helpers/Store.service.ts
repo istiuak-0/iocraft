@@ -8,13 +8,7 @@ export function Store<T extends Record<string, any>>(initialState: T) {
       return this.state;
     }
 
-    setState(partialState: Partial<T>): void {
-      for (const key in partialState) {
-        if (Object.hasOwn(partialState, key) && partialState[key] !== undefined) {
-          (this.state as any)[key] = partialState[key];
-        }
-      }
-    }
+    setState(_partialState: Partial<T>) {}
 
     select<K extends keyof T>(key: K): ComputedRef<T[K]> {
       return computed(() => this.state[key]);
