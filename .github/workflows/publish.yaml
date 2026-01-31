@@ -28,7 +28,7 @@ jobs:
       - name: Build Package
         run: pnpm vuedi:build
       - name: Publish to npm
-        run: pnpm --filter vuedi publish --no-git-checks --access public --provenance
+        run: pnpm --filter iocraft publish --no-git-checks --access public --provenance
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_ACCESS_TOKEN }}
       - name: Create GitHub Release
