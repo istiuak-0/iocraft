@@ -63,3 +63,7 @@ export function ExposeToContext<T extends ServiceConstructor>(_classOrInstance: 
 export function RemoveFromRegistry() {
   console.log('removing from registry');
 }
+
+export function InstanceOf() {
+  console.log('deciding instance');
+}
