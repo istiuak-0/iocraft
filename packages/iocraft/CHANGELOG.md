@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.2.2](https://github.com/istiuak-0/iocraft/compare/v0.2.1...v0.2.2) (2026-01-31)
+
+
+### Bug Fixes
+
+* instance utils ([#21](https://github.com/istiuak-0/iocraft/issues/21)) ([32b8d64](https://github.com/istiuak-0/iocraft/commit/32b8d6421403a239c585647135a22e4dff3ab061))
+* RemoveFromRegistry function ([26112a9](https://github.com/istiuak-0/iocraft/commit/26112a9c9053bd43d5a72ae85de256da575b933f))
+
 ## [0.2.1](https://github.com/istiuak-0/iocraft/compare/v0.2.0...v0.2.1) (2026-01-31)
 
 
