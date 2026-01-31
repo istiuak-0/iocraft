@@ -1,7 +1,7 @@
 {
   "name": "iocraft",
   "version": "0.2.0",
-  "description": "A lightweight, type-safe Dependency Injection (DI) container for Vue 3 using the Composition API.",
+  "description": "A lightweight, DI & IOC container for Vue 3 using the Composition API.",
   "keywords": [
     "vue",
     "vue3",
@@ -54,7 +54,6 @@
     "vue-router": "^4.0.0"
   },
   "devDependencies": {
-    "@types/node": "^22.0.0",
     "tsup": "^8.5.1",
     "typescript": "~5.9.3",
     "vitest": "^4.0.16",

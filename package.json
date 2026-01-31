@@ -1,15 +1,15 @@
 {
-  "name": "@vuedi/root",
-  "description": "Monorepo for Vue Dependency Injection (DI) libraries",
+  "name": "@iocraft/root",
+  "description": "Monorepo for iocraft",
   "private": true,
   "scripts": {
     "i:all": "pnpm --recursive install",
     "clean": "find . -name node_modules -type d -exec rm -rf {} + && rm -rf node_modules && pnpm --recursive exec rimraf dist",
     "iocraft:build": "pnpm --filter iocraft build",
     "iocraft:dev": "pnpm --filter iocraft dev",
-    "playground:dev": "pnpm --filter @vuedi/playground dev",
+    "playground:dev": "pnpm --filter @iocraft/playground dev",
     "typecheck": "pnpm --recursive typecheck",
-    "core:test": "pnpm --filter @vuedi/core  test",
+    "core:test": "pnpm --filter @iocraft/core  test",
     "lint": "pnpm --recursive lint"
   },
   "devDependencies": {
