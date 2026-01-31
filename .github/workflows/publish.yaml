@@ -26,7 +26,7 @@ jobs:
       - name: Install Deps
         run: pnpm install --frozen-lockfile
       - name: Build Package
-        run: pnpm vuedi:build
+        run: pnpm iocraft:build
       - name: Publish to npm
         run: pnpm --filter iocraft publish --no-git-checks --access public --provenance
         env:

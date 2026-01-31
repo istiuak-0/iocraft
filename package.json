@@ -5,8 +5,8 @@
   "scripts": {
     "i:all": "pnpm --recursive install",
     "clean": "find . -name node_modules -type d -exec rm -rf {} + && rm -rf node_modules && pnpm --recursive exec rimraf dist",
-    "iocraft:build": "pnpm --filter vuedi build",
-    "iocraft:dev": "pnpm --filter vuedi dev",
+    "iocraft:build": "pnpm --filter iocraft build",
+    "iocraft:dev": "pnpm --filter iocraft dev",
     "playground:dev": "pnpm --filter @vuedi/playground dev",
     "typecheck": "pnpm --recursive typecheck",
     "core:test": "pnpm --filter @vuedi/core  test",
