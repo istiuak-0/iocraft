@@ -1,24 +1,39 @@
 name: publish to npm
 
 on:
-  workflow_dispatch:
+  push:
+    tags:
+      - "v*.*.*"
+
+permissions:
+  contents: write
+  id-token: write
 
 jobs:
-  publish-on-npm:
+  publish:
     runs-on: ubuntu-latest
     steps:
       - name: Setup Node.js environment
         uses: actions/setup-node@v6.2.0
         with:
-          node-version: '24.x'
-          registry-url: 'https://registry.npmjs.org'
+          node-version: "24.x"
+          registry-url: "https://registry.npmjs.org"
           cache: pnpm
       - name: Setup pnpm
         uses: pnpm/action-setup@v4.2.0
         with:
-          version: '10.x'
+          version: "10.x"
       - name: Checkout
         uses: actions/checkout@v6.0.1
       - name: Install Deps
         run: pnpm install --frozen-lockfile --filter "!@vuedi/playground"
-        ##TODO: FINISH NEXT STEPS
+      - name: Build Package
+        run: pnpm vuedi:build
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          generate_release_notes: true
+      # - name: Publish to npm
+      #   run: pnpm --filter=./packages/core publish --no-git-checks --access public
+      #   env:
+      #     NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
