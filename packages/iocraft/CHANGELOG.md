@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.2.3](https://github.com/istiuak-0/iocraft/compare/v0.2.2...v0.2.3) (2026-01-31)
+
+
+### Bug Fixes
+
+* store ([#22](https://github.com/istiuak-0/iocraft/issues/22)) ([1089bd6](https://github.com/istiuak-0/iocraft/commit/1089bd63439b0b47b61e3d97d994a3984c2cbfd3))
+
 ## [0.2.2](https://github.com/istiuak-0/iocraft/compare/v0.2.1...v0.2.2) (2026-01-31)
 
 
