@@ -1,18 +1,12 @@
-import { computed, type ComputedRef } from 'vue';
-
 export function Store<T extends Record<string, any>>(initialState: T) {
   return class {
     state = initialState;
 
-    getState(): T {
-      return this.state;
-    }
+    getState() {}
 
     setState(_partialState: Partial<T>) {}
 
-    select<K extends keyof T>(key: K): ComputedRef<T[K]> {
-      return computed(() => this.state[key]);
-    }
+    select<K extends keyof T>(_key: K) {}
 
     computed() {}
 
@@ -20,17 +14,7 @@ export function Store<T extends Record<string, any>>(initialState: T) {
 
     watchEffect() {}
 
-    reset(): void {
-      const fresh = initialState;
-
-      for (const key in this.state) {
-        if (Object.hasOwn(this.state, key)) delete (this.state as any)[key];
-      }
-
-      for (const key in fresh) {
-        if (Object.hasOwn(fresh, key)) (this.state as any)[key] = fresh[key];
-      }
-    }
+    reset(): void {}
 
     onInit() {}
 
