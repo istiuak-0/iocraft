@@ -1,3 +1,4 @@
+import { getCurrentInstance, onScopeDispose } from 'vue';
 import type { ServiceConstructor } from '../utils/core.types';
 import { getServiceMeta, RootRegistry, TempRegistry } from '../utils/core.utils';
 import { createFacadeObj } from './facade';
@@ -6,13 +7,11 @@ import { createFacadeObj } from './facade';
  * Injects a global singleton service From Root Registry;
  *
  * @export
- * @template {ServiceConstructor} T 
- * @param {T} serviceClass 
- * @returns {InstanceType<T>} 
+ * @template {ServiceConstructor} T
+ * @param {T} serviceClass
+ * @returns {InstanceType<T>}
  */
-export function Inject<T extends ServiceConstructor>(
-  serviceClass: T,
-): InstanceType<T> {
+export function Inject<T extends ServiceConstructor>(serviceClass: T): InstanceType<T> {
   const serviceMeta = getServiceMeta(serviceClass);
 
   // Ensure singleton
@@ -33,26 +32,17 @@ export function Inject<T extends ServiceConstructor>(
   return instance as InstanceType<T>;
 }
 
+export function InjectInstance<T extends ServiceConstructor>(serviceClass: T) {
+  let instance = new serviceClass();
+  const componentInstance = getCurrentInstance();
 
-
-
-// export function InjectInstance<T extends ServiceConstructor>(serviceClass: T): InstanceType<T> {
-//   let instance = new serviceClass();
-//   // const componentInstance = getCurrentInstance();
-
-//   // if (componentInstance) {
-//   //   onScopeDispose(() => {
-//   //     if (ImplementsDispose(instance)) {
-//   //       try {
-//   //         (instance as ServiceWithDispose<typeof instance>).dispose();
-//   //       } catch (error) {
-//   //         console.error('[VUE DI]: Error in scope dispose:', error);
-//   //       }
-//   //     }
-//   //   });
-//   // }
-//   return instance as InstanceType<T>;
-// }
+  if (componentInstance) {
+    onScopeDispose(() => {
+      console.error('[IocRaft]: Scope Dispose Run');
+    });
+  }
+  return instance as InstanceType<T>;
+}
 
 // export function InjectFromContext<T extends ServiceConstructor>(serviceClass: T) {
 //   const serviceMeta = getServiceMeta(serviceClass);
