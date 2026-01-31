@@ -20,5 +20,5 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6.0.1
       - name: Install Deps
-        run: pnpm i:all
+        run: pnpm install --frozen-lockfile --filter "!@vuedi/playground"
         ##TODO: FINISH NEXT STEPS
