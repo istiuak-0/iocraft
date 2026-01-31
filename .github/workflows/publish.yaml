@@ -27,10 +27,14 @@ jobs:
         run: pnpm install --frozen-lockfile
       - name: Build Package
         run: pnpm iocraft:build
+
+      - name: Authenticate to npm with Granular Token
+        run: |
+          echo "//registry.npmjs.org/:_authToken=${NPM_ACCESS_TOKEN}" > ~/.npmrc
+        env:
+          NPM_ACCESS_TOKEN: ${{ secrets.NPM_ACCESS_TOKEN }}
       - name: Publish to npm
         run: pnpm --filter iocraft publish --no-git-checks --access public --provenance
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_ACCESS_TOKEN }}
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
