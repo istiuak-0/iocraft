@@ -1,5 +1,5 @@
 import type { Router } from 'vue-router';
-import type { ServiceConstructor } from '../utils/core.types';
+import type { ServiceConstructor } from './core';
 
 function hasKey(obj: Record<PropertyKey, unknown>, key: PropertyKey): boolean {
   if (typeof key === 'symbol') {

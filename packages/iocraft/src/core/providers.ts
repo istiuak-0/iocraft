@@ -1,4 +1,6 @@
-import { SERVICE_METADATA, type ServiceConstructor, type ServiceMetadata, type ServiceOptions } from "./internals";
+import type { ServiceConstructor, ServiceMetadata, ServiceOptions } from "./core";
+import { SERVICE_METADATA } from "./internals";
+
 
 /**
  * Registers A Class as Service
@@ -22,55 +24,3 @@ export function Provide(options?: ServiceOptions): <C extends ServiceConstructor
   };
 }
 
-interface RegisterServiceOptions extends ServiceOptions {
-  /** Override the default instance */
-  instance?: object;
-  /** Custom token instead of auto-generated */
-  token?: symbol | string;
-  /** Lifecycle hooks */
-  onInit?: (instance: object) => void;
-  onDispose?: (instance: object) => void;
-}
-
-/**
- * Manually register a service without decorator
- * Use case: Dynamic registration, third-party classes
- */
-export function RegisterService<T extends ServiceConstructor>(
-  serviceClass: T,
-  options?: RegisterServiceOptions
-) {}
-
-
-
-/**
- * Register a factory function instead of a class
- * Use case: Complex initialization logic
- */
-export function RegisterFactory<T>(
-  token: symbol | string,
-  factory: (container: unknown) => T,
-  options?: FactoryOptions
-) {}
-
-interface FactoryOptions {
-  singleton?: boolean;
-  facade?: boolean;
-}
-
-
-export function RegisterValue<T>(
-  token: symbol | string,
-  value: T
-){
-
-}
-
-export function RegisterModule(services: Array<{
-  serviceClass: ServiceConstructor;
-  options?: RegisterServiceOptions;
-}>){
-
-
-
-}

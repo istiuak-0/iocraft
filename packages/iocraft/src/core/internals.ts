@@ -1,32 +1,48 @@
-import type { Router } from 'vue-router';
+import {
+  onMounted,
+  onUpdated,
+  onUnmounted,
+  onBeforeMount,
+  onBeforeUpdate,
+  onBeforeUnmount,
+  onErrorCaptured,
+  onRenderTracked,
+  onRenderTriggered,
+  onActivated,
+  onDeactivated,
+  onServerPrefetch,
+  onScopeDispose,
+} from 'vue';
 
 export const SERVICE_METADATA = Symbol('IOCRAFT_SERVICE_METADATA');
 export const RootRegistry = new Map<symbol, object>();
 export const TempRegistry = new Map<symbol, object>();
 
-export function getServiceMeta(target: ServiceConstructor | object) {
-  const ctor = typeof target === 'function' ? target : target.constructor;
+const lifecycleHookMap = {
+  onMounted,
+  onUpdated,
+  onUnmounted,
+  onBeforeMount,
+  onBeforeUpdate,
+  onBeforeUnmount,
+  onErrorCaptured,
+  onRenderTracked,
+  onRenderTriggered,
+  onActivated,
+  onDeactivated,
+  onServerPrefetch,
+  onScopeDispose,
+} as const;
 
-  const meta = (ctor as any)[SERVICE_METADATA] as ServiceMetadata;
-  if (!meta?.token) {
-    throw new Error(`[IOCRAFT]: ${ctor?.name || 'Unknown'} is not decorated with @Provide()`);
+export function bindLifecycleHooks(instance: any) {
+  for (const key in lifecycleHookMap) {
+    const hookName = key as keyof typeof lifecycleHookMap;
+    const vueHook = lifecycleHookMap[hookName];
+
+    const handler = instance[hookName];
+
+    if (typeof handler === 'function') {
+      vueHook(handler.bind(instance));
+    }
   }
-  return meta;
 }
-
-
-export type ServiceConstructor<T extends object = object> = new (...args: any[]) => T;
-
-export type PluginOptions = {
-  EagerLoad: ServiceConstructor[];
-  router: Router;
-};
-
-export interface ServiceOptions {
-  facade?: boolean;
-}
-
-export type ServiceMetadata = {
-  token: symbol;
-  facade: boolean;
-};
