@@ -1,4 +1,4 @@
-import type { ServiceConstructor, ServiceMetadata } from './core.types';
+import type { Router } from 'vue-router';
 
 export const SERVICE_METADATA = Symbol('IOCRAFT_SERVICE_METADATA');
 export const RootRegistry = new Map<symbol, object>();
@@ -13,3 +13,20 @@ export function getServiceMeta(target: ServiceConstructor | object) {
   }
   return meta;
 }
+
+
+export type ServiceConstructor<T extends object = object> = new (...args: any[]) => T;
+
+export type PluginOptions = {
+  EagerLoad: ServiceConstructor[];
+  router: Router;
+};
+
+export interface ServiceOptions {
+  facade?: boolean;
+}
+
+export type ServiceMetadata = {
+  token: symbol;
+  facade: boolean;
+};
