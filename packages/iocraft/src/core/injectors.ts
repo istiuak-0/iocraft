@@ -1,7 +1,8 @@
 import { getCurrentInstance, inject, provide } from 'vue';
 import { createFacadeObj } from './facade';
 import type { ServiceConstructor } from './core';
-import { bindLifecycleHooks, getServiceMetadata, RootRegistry, TempRegistry } from './internals';
+import { bindLifecycleHooks, RootRegistry, TempRegistry } from './internals';
+import { GetServiceMetadata } from './utils';
 
 /**
  * Injects a global singleton service From Root Registry
@@ -12,7 +13,7 @@ import { bindLifecycleHooks, getServiceMetadata, RootRegistry, TempRegistry } fr
  * @returns {InstanceType<T>}
  */
 export function Inject<T extends ServiceConstructor>(serviceClass: T): InstanceType<T> {
-  const serviceMeta = getServiceMetadata(serviceClass);
+  const serviceMeta = GetServiceMetadata(serviceClass);
 
   if (!RootRegistry.has(serviceMeta.token)) {
     RootRegistry.set(serviceMeta.token, new serviceClass());
@@ -40,7 +41,7 @@ export function Inject<T extends ServiceConstructor>(serviceClass: T): InstanceT
  * @returns {InstanceType<T>}
  */
 export function InjectInstance<T extends ServiceConstructor>(serviceClass: T): InstanceType<T> {
-  const serviceMeta = getServiceMetadata(serviceClass);
+  const serviceMeta = GetServiceMetadata(serviceClass);
   const componentInstance = getCurrentInstance();
   let instance = new serviceClass();
 
@@ -65,7 +66,7 @@ export function InjectInstance<T extends ServiceConstructor>(serviceClass: T): I
  * @param {InstanceType<T>} serviceInstance
  */
 export function ExposeToContext<T extends ServiceConstructor>(serviceInstance: InstanceType<T>) {
-  const serviceMeta = getServiceMetadata(serviceInstance);
+  const serviceMeta = GetServiceMetadata(serviceInstance);
   provide(serviceMeta.token, serviceInstance);
 }
 
@@ -78,6 +79,6 @@ export function ExposeToContext<T extends ServiceConstructor>(serviceInstance: I
  * @returns {*}
  */
 export function InjectFromContext<T extends ServiceConstructor>(serviceClass: T) {
-  const serviceMeta = getServiceMetadata(serviceClass);
+  const serviceMeta = GetServiceMetadata(serviceClass);
   return inject<InstanceType<T>>(serviceMeta.token);
 }

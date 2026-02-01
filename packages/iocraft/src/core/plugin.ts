@@ -1,18 +1,19 @@
 import { type FunctionPlugin } from 'vue';
-import type { PluginOptions } from '../utils/core.types';
-import { getServiceMeta, RootRegistry, TempRegistry } from '../utils/core.utils';
 import { createFacadeObj, generateRouterFacade } from './facade';
 import { Nav } from '../helpers';
+import type { PluginOptions } from './core';
+import { RootRegistry, TempRegistry } from './internals';
+import { GetServiceMetadata } from './utils';
 
 export const IocRaftPlugin: FunctionPlugin<[Partial<PluginOptions>?]> = (_app, options?: Partial<PluginOptions>) => {
   if (options?.router) {
-    RootRegistry.set(getServiceMeta(Nav).token, generateRouterFacade(options.router));
+    RootRegistry.set(GetServiceMetadata(Nav).token, generateRouterFacade(options.router));
   }
 
   ///Eagerly create Service instances
   if (options?.EagerLoad) {
     options.EagerLoad.forEach(service => {
-      const serviceMeta = getServiceMeta(service);
+      const serviceMeta = GetServiceMetadata(service);
 
       if (!RootRegistry.has(serviceMeta.token)) {
         RootRegistry.set(serviceMeta.token, new service());
