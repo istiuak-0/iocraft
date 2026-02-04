@@ -27,6 +27,8 @@ jobs:
         run: pnpm install --frozen-lockfile
       - name: Build Package
         run: pnpm iocraft:build
+      - name: Copy Readme to Package
+        run: cp README.md packages/iocraft/README.md
       - name: Publish to npm
         run: pnpm --filter iocraft publish --no-git-checks --access public --provenance
       - name: Create GitHub Release
