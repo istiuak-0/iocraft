@@ -1,12 +1,5 @@
 # Changelog
 
-## [0.2.4](https://github.com/istiuak-0/iocraft/compare/v0.2.3...v0.2.4) (2026-02-04)
-
-
-### Features
-
-* add lifecycle hooks and introduce new obtainers ([#24](https://github.com/istiuak-0/iocraft/issues/24)) ([ad91529](https://github.com/istiuak-0/iocraft/commit/ad91529cd177ac22483b6f9c6d72bb702bcb6422))
-
 ## [0.2.3](https://github.com/istiuak-0/iocraft/compare/v0.2.2...v0.2.3) (2026-01-31)
 
 
