@@ -91,12 +91,12 @@ function addPrototypeProperties<T extends object>(
  * @param {InstanceType<ServiceConstructor<T>>} serviceInstance
  * @returns {{}}
  */
-export function createFacadeObj<T extends object>(serviceInstance: InstanceType<ServiceConstructor<T>>) {
+export function createFacadeObj<T extends object>(serviceInstance: object) {
   const targetObj = {};
 
   addInstanceProperties(serviceInstance, targetObj);
   addPrototypeProperties(serviceInstance, targetObj);
-  return targetObj;
+  return targetObj as T;
 }
 
 export function generateRouterFacade(router: Router): Record<string, any> {
