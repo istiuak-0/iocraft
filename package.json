@@ -10,7 +10,10 @@
     "playground:dev": "pnpm --filter @iocraft/playground dev",
     "typecheck": "pnpm --recursive typecheck",
     "iocraft:test": "pnpm --filter iocraft  test",
-    "iocraft:bench": "pnpm --filter iocraft  bench"
+    "iocraft:bench": "pnpm --filter iocraft  bench",
+    "docs:dev": "pnpm --filter @iocraft/docs dev",
+    "docs:build": "pnpm --filter @iocraft/docs  build",
+    "docs:preview": "pnpm --filter @iocraft/docs preview"
   },
   "packageManager": "pnpm@10.18.0",
   "devDependencies": {
