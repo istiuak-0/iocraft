@@ -47,14 +47,14 @@
     "build": "tsup",
     "dev": "tsup --watch",
     "typecheck": "tsc --noEmit",
-    "test": "vitest bench"
+    "test": "vitest",
+    "bench": "vitest bench"
   },
   "peerDependencies": {
     "vue": "^3.0.0",
     "vue-router": "^4.0.0"
   },
   "devDependencies": {
-    "tinybench": "^6.0.0",
     "tsup": "^8.5.1",
     "typescript": "~5.9.3",
     "vitest": "^4.0.16",

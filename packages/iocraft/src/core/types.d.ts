@@ -64,3 +64,6 @@ export interface OnScopeDispose {
   onScopeDispose(): void;
 }
 
+export interface OnUnRegister {
+  onUnRegister(): void
+}
