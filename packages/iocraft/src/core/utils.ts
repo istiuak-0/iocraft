@@ -19,9 +19,39 @@ export function getServiceMetadata(target: ServiceConstructor | object) {
 }
 
 
-export function HasService(serviceClass: ServiceConstructor) {
+/**
+ * Check if a service is present in registry
+ *
+ * @export
+ * @param {ServiceConstructor} serviceClass 
+ * @returns {*} 
+ */
+export function hasService(serviceClass: ServiceConstructor) {
   const meta = getServiceMetadata(serviceClass);
   return RootRegistry.has(meta.token);
 }
 
-export function IsFacade(_serviceInstance: object) {}
+
+/**
+ * unRegister (remove) a service from registry
+ *
+ * @export
+ * @param {ServiceConstructor} serviceClass 
+ * @returns {*} 
+ */
+export function unRegister(serviceClass: ServiceConstructor) {
+  const meta = getServiceMetadata(serviceClass);
+  return RootRegistry.delete(meta.token)
+}
+
+
+
+
+/**
+ * clear service registry
+ *
+ * @export
+ */
+export function clearRegistry() {
+  RootRegistry.clear()
+}
