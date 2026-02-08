@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.2.5](https://github.com/istiuak-0/iocraft/compare/v0.2.4...v0.2.5) (2026-02-08)
+
+
+### Features
+
+* add utils and improve store api ([#30](https://github.com/istiuak-0/iocraft/issues/30)) ([678015e](https://github.com/istiuak-0/iocraft/commit/678015e73836c59c42f27672ceff1eea318c2a6b))
+
 ## [0.2.4](https://github.com/istiuak-0/iocraft/compare/v0.2.3...v0.2.4) (2026-02-04)
 
 
