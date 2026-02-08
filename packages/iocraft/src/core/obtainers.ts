@@ -1,7 +1,6 @@
 import { getCurrentInstance, inject, provide } from 'vue';
 import { createFacadeObj } from './facade';
 import { bindLifecycleHooks, creationStack, RootRegistry } from './internals';
-import { createLazyProxy } from './lazy-proxy';
 import type { ServiceConstructor } from './types';
 import { getServiceMetadata } from './utils';
 
@@ -13,22 +12,16 @@ import { getServiceMetadata } from './utils';
  * @param {T} serviceClass
  * @returns {InstanceType<T>}
  */
-export function obtain<T extends ServiceConstructor>(serviceClass: T): InstanceType<T> {
+export function obtain<T extends ServiceConstructor>(serviceClass: T) {
   const serviceMeta = getServiceMetadata(serviceClass);
 
   if (RootRegistry.has(serviceMeta.token)) {
     const instance = RootRegistry.get(serviceMeta.token)!;
-    return createFacadeObj(instance);
+    return createFacadeObj<InstanceType<T>>(instance);
   }
 
   if (creationStack.has(serviceMeta.token)) {
-    if (__DEV__) {
-      console.warn(
-        `[IocRaft] Circular dependency detected: ${serviceClass.name}\n` +
-          `Resolving with lazy proxy. Access dependencies in methods, not constructors.`
-      );
-    }
-    return createLazyProxy(serviceClass, serviceMeta, true); // true = facade
+    throw new Error(`[IocRaft] Circular dependency detected on: ${serviceClass.name}\n`);
   }
 
   creationStack.add(serviceMeta.token);
@@ -36,7 +29,7 @@ export function obtain<T extends ServiceConstructor>(serviceClass: T): InstanceT
   try {
     const instance = new serviceClass();
     RootRegistry.set(serviceMeta.token, instance);
-    return createFacadeObj(instance);
+    return createFacadeObj<InstanceType<T>>(instance);
   } finally {
     creationStack.delete(serviceMeta.token);
   }
@@ -50,7 +43,7 @@ export function obtain<T extends ServiceConstructor>(serviceClass: T): InstanceT
  * @param {T} serviceClass
  * @returns {InstanceType<T>}
  */
-export function obtainRaw<T extends ServiceConstructor>(serviceClass: T): InstanceType<T> {
+export function obtainRaw<T extends ServiceConstructor>(serviceClass: T) {
   const serviceMeta = getServiceMetadata(serviceClass);
 
   if (RootRegistry.has(serviceMeta.token)) {
@@ -58,13 +51,7 @@ export function obtainRaw<T extends ServiceConstructor>(serviceClass: T): Instan
   }
 
   if (creationStack.has(serviceMeta.token)) {
-    if (__DEV__) {
-      console.warn(
-        `[IocRaft] Circular dependency detected: ${serviceClass.name}\n` +
-          `Resolving with lazy proxy. Access dependencies in methods, not constructors.`
-      );
-    }
-    return createLazyProxy(serviceClass, serviceMeta, false);
+    throw new Error(`[IocRaft] Circular dependency detected on: ${serviceClass.name}\n`);
   }
 
   creationStack.add(serviceMeta.token);
@@ -73,43 +60,6 @@ export function obtainRaw<T extends ServiceConstructor>(serviceClass: T): Instan
     const instance = new serviceClass();
     RootRegistry.set(serviceMeta.token, instance);
     return instance as InstanceType<T>;
-  } finally {
-    creationStack.delete(serviceMeta.token);
-  }
-}
-
-/**
- * obtain a new Service Instance
- *
- * @export
- * @template {ServiceConstructor} T
- * @param {T} serviceClass
- * @returns {InstanceType<T>}
- */
-export function obtainRawInstance<T extends ServiceConstructor>(serviceClass: T) {
-  const serviceMeta = getServiceMetadata(serviceClass);
-
-  if (creationStack.has(serviceMeta.token)) {
-    if (__DEV__) {
-      console.warn(
-        `[IocRaft] Circular dependency in TRANSIENT instance: ${serviceClass.name}\n` +
-          `This creates a new instance on every access, which can cause infinite recursion!\n` +
-          `Consider using obtain() or obtainRaw() for at least one of these services.`
-      );
-    }
-    return createLazyProxy(serviceClass, serviceMeta, false);
-  }
-
-  creationStack.add(serviceMeta.token);
-
-  try {
-    const componentInstance = getCurrentInstance();
-    const instance = new serviceClass();
-
-    if (componentInstance) {
-      bindLifecycleHooks(instance);
-    }
-    return createFacadeObj<InstanceType<T>>(instance);
   } finally {
     creationStack.delete(serviceMeta.token);
   }
@@ -127,17 +77,11 @@ export function obtainInstance<T extends ServiceConstructor>(serviceClass: T) {
   const serviceMeta = getServiceMetadata(serviceClass);
 
   if (creationStack.has(serviceMeta.token)) {
-    if (__DEV__) {
-      console.warn(
-        `[IocRaft] Circular dependency in TRANSIENT instance: ${serviceClass.name}\n` +
-          `This creates a new instance on every access, which can cause infinite recursion!\n` +
-          `Consider using obtain() or obtainRaw() for at least one of these services.`
-      );
-    }
-    return createLazyProxy(serviceClass, serviceMeta, true);
+    throw new Error(`[IocRaft] Circular dependency detected on: ${serviceClass.name}\n`);
   }
 
   creationStack.add(serviceMeta.token);
+
   try {
     const componentInstance = getCurrentInstance();
     const instance = new serviceClass();
@@ -151,6 +95,42 @@ export function obtainInstance<T extends ServiceConstructor>(serviceClass: T) {
     creationStack.delete(serviceMeta.token);
   }
 }
+
+
+
+
+
+/**
+ * obtain a new Service Instance
+ *
+ * @export
+ * @template {ServiceConstructor} T
+ * @param {T} serviceClass
+ * @returns {InstanceType<T>}
+ */
+export function obtainRawInstance<T extends ServiceConstructor>(serviceClass: T) {
+  const serviceMeta = getServiceMetadata(serviceClass);
+
+  if (creationStack.has(serviceMeta.token)) {
+    throw new Error(`[IocRaft] Circular dependency detected on: ${serviceClass.name}\n`);
+  }
+
+  creationStack.add(serviceMeta.token);
+
+  try {
+    const componentInstance = getCurrentInstance();
+    const instance = new serviceClass();
+
+    if (componentInstance) {
+      bindLifecycleHooks(instance);
+    }
+    return instance as InstanceType<T>;
+  } finally {
+    creationStack.delete(serviceMeta.token);
+  }
+}
+
+
 
 /**
  * Expose a service to context

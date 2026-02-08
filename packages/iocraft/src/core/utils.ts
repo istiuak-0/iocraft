@@ -18,9 +18,6 @@ export function getServiceMetadata(target: ServiceConstructor | object) {
   return meta;
 }
 
-export function clearRegistry() {
-  RootRegistry.clear();
-}
 
 export function HasService(serviceClass: ServiceConstructor) {
   const meta = getServiceMetadata(serviceClass);
