@@ -15,7 +15,6 @@ export function Store<T extends Record<string, any>>(initialState: T) {
       Object.assign(state, changes);
     }
 
-
     pick<K extends keyof T>(key: K): T[K] {
       return state[key]
     }
@@ -23,7 +22,6 @@ export function Store<T extends Record<string, any>>(initialState: T) {
     compute<R>(fn: (state: T) => R): ComputedRef<R> {
       return computed(() => fn(state));
     }
-
 
     observe<K extends keyof T>(
       source: K,
@@ -45,9 +43,6 @@ export function Store<T extends Record<string, any>>(initialState: T) {
 
       return watch(getter, callback);
     }
-
-
-
 
     effect(fn: (state: T) => void): WatchStopHandle {
       return watchEffect(() => fn(state));
