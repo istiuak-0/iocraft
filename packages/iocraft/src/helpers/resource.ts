@@ -51,9 +51,17 @@ export interface ResourceOptions<T = any> {
 }
 
 
-export function defineResource<T = any>(_option: ResourceOptions) {
+export function defineResource<T = any>(option?: ResourceOptions) {
 
 
+return {
+  
+}
+
+}
 
 
+export function resourceFactory() {
+
+return defineResource()
 }
