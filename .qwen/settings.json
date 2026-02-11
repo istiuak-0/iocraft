@@ -1,0 +1,77 @@
+{
+  "project": {
+    "name": "iocraft",
+    "type": "vue-dependency-injection-library",
+    "language": "typescript",
+    "framework": "vue3",
+    "architecture": "monorepo",
+    "packages": [
+      "iocraft",
+      "playground",
+      "docs"
+    ]
+  },
+  "code_conventions": {
+    "naming": {
+      "services": "PascalCase with Service suffix",
+      "decorators": "PascalCase",
+      "functions": "camelCase",
+      "constants": "UPPER_SNAKE_CASE"
+    },
+    "patterns": [
+      "Use @Register() decorator for service classes",
+      "Use obtain() for singleton services",
+      "Use obtainInstance() for per-component instances",
+      "Preserve reactivity when destructuring services",
+      "Use getters for circular dependencies"
+    ]
+  },
+  "important_files": [
+    "packages/iocraft/src/core/obtainers.ts",
+    "packages/iocraft/src/core/facade.ts",
+    "packages/iocraft/src/core/internals.ts",
+    "packages/iocraft/src/helpers/store.ts",
+    "packages/iocraft/src/helpers/Nav.service.ts"
+  ],
+  "development_workflow": {
+    "build": "pnpm iocraft:build",
+    "dev": "pnpm iocraft:dev",
+    "test": "pnpm iocraft:test",
+    "playground": "pnpm playground:dev",
+    "docs": "pnpm docs:dev"
+  },
+  "dependencies": {
+    "required": [
+      "vue (^3.0.0)",
+      "vue-router (^4.0.0)"
+    ],
+    "dev": [
+      "tsup",
+      "typescript",
+      "vitest",
+      "vue",
+      "vue-router"
+    ]
+  },
+  "key_features": [
+    "Dependency Injection Container",
+    "Reactive Service Facades",
+    "Vue Lifecycle Hook Integration",
+    "Component Context Sharing",
+    "Circular Dependency Resolution",
+    "Router Integration",
+    "State Management Utilities"
+  ],
+  "api_functions": [
+    "obtain",
+    "obtainRaw",
+    "obtainInstance",
+    "obtainRawInstance",
+    "obtainFromContext",
+    "exposeToContext",
+    "hasService",
+    "unRegister",
+    "clearRegistry",
+    "Register"
+  ]
+}
