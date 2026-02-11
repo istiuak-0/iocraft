@@ -32,7 +32,7 @@ iocraft is a lightweight dependency injection (DI) container for Vue 3 applicati
 
 ### 5. Helper Utilities
 - `Nav` service for router functionality
-- `Store` utility for state management
+- `Store` higher-order function for creating state management base classes
 - Circular dependency resolution using getters
 
 ## Architecture Components

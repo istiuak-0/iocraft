@@ -23,7 +23,8 @@
       "Use obtain() for singleton services",
       "Use obtainInstance() for per-component instances",
       "Preserve reactivity when destructuring services",
-      "Use getters for circular dependencies"
+      "Use getters for circular dependencies",
+      "Use Store higher-order function for state management base classes"
     ]
   },
   "important_files": [
@@ -60,7 +61,7 @@
     "Component Context Sharing",
     "Circular Dependency Resolution",
     "Router Integration",
-    "State Management Utilities"
+    "State Management Higher-Order Function"
   ],
   "api_functions": [
     "obtain",

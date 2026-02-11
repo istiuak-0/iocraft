@@ -46,7 +46,7 @@ iocraft/
 
 ### 2. Helper Modules
 - **Nav.service.ts**: Provides navigation service that integrates with Vue Router
-- **store.ts**: Implements a reactive state management utility
+- **store.ts**: Implements a Store higher-order function that creates base classes with common state management methods
 
 ### 3. Key Concepts
 - **Dependency Injection**: Services are registered with @Register() and retrieved using obtain functions
@@ -106,7 +106,7 @@ iocraft/
 
 ## Common Use Cases
 1. Creating services with business logic
-2. Managing application state with reactive stores
+2. Managing application state with Store higher-order function base classes
 3. Handling component lifecycle with service hooks
 4. Sharing services between parent and child components
 5. Integrating with Vue Router for navigation
@@ -120,3 +120,4 @@ iocraft/
 - Use getters instead of field initialization for circular dependencies
 - Implement `OnUnRegister` interface for cleanup when services are unregistered
 - Use `exposeToContext()` and `obtainFromContext()` for parent-child component communication
+- Use the Store higher-order function to create base classes with common state management methods

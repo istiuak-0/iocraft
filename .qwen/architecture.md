@@ -151,21 +151,27 @@ const { data, addItem } = dataService;
 </script>
 ```
 
-### 5. State Management with Store
+### 5. State Management with Store Higher-Order Function
 ```typescript
-const CounterStore = Store({ count: 0, name: 'counter' });
+// Store is a higher-order function that creates a base class with common state management methods
 @Register()
-export class CounterService {
-  Store = new CounterStore();
-  
-  increment() {
-    this.Store.update({ count: this.Store.state.count + 1 });
-  }
-  
-  get doubleCount() {
-    return this.Store.compute(s => s.count * 2);
-  }
+export class AppStore extends Store({
+  data: 'test',
+  count: 0
+}) {
+  // All state management methods are available from the Store base class
+  // This provides an easy way to do state management with proper methods
 }
+
+// The Store HOF provides methods like:
+// - state: reactive state object
+// - update(changes): updates state properties
+// - pick(key): picks a specific state property
+// - compute(fn): creates computed properties
+// - observe(source, callback): watches state changes
+// - effect(fn): runs side effects
+// - reset(): resets to initial state
+// - snapshot: gets a snapshot of current state
 ```
 
 ### 6. Router Integration
