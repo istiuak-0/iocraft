@@ -1,2 +1,2 @@
-export * from './helpers/Nav.service';
+export * from './helpers/nav';
 export * from './helpers/store';
