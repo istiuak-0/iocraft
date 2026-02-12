@@ -74,5 +74,6 @@
     "unRegister",
     "clearRegistry",
     "Register"
-  ]
+  ],
+  "$version": 3
 }

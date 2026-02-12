@@ -1,4 +1,4 @@
-import type { ComputedRef, Ref } from "vue";
+import { reactive, ref, type ComputedRef, type Ref } from "vue";
 
 export interface ResourceOptions<T = any> {
   // Main Query function to fetch data
@@ -51,17 +51,35 @@ export interface ResourceOptions<T = any> {
 }
 
 
-export function defineResource<T = any>(option?: ResourceOptions) {
+interface Resource<T = any> {
+  data: Ref<T | undefined>;
+  loading: Ref<boolean>;
+  error: Ref<Error | null>;
+  status: Ref<'idle' | 'loading' | 'success' | 'error'>;
+  previousData: Ref<T | undefined>;
+  isStale: Ref<boolean>;
+  isFetching: Ref<boolean>;
+  mutate: (...args: any[]) => void;
+  refetch: (...args: any[]) => void;
+  exec: (...args: any[]) => void;
+  clear: () => void;
+  abort: () => void;
+}
+
+
+export function defineResource(option: ResourceOptions) {
+
+
 
 
 return {
-  
-}
 
 }
 
-
-export function resourceFactory() {
-
-return defineResource()
 }
+
+
+// export function resourceFactory() {
+
+// return defineResource()
+// }
