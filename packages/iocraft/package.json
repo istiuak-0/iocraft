@@ -34,10 +34,10 @@
       "import": "./dist/core.js",
       "require": "./dist/core.cjs"
     },
-    "./helpers": {
-      "types": "./dist/helpers.d.ts",
-      "import": "./dist/helpers.js",
-      "require": "./dist/helpers.cjs"
+    "./common": {
+      "types": "./dist/common.d.ts",
+      "import": "./dist/common.js",
+      "require": "./dist/common.cjs"
     }
   },
   "files": [

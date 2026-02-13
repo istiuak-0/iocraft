@@ -9,7 +9,7 @@ const __USE_DEVTOOLS__ = (__DEV__ || process.env.VUE_PROD_DEVTOOLS === 'true') &
 export default defineConfig({
   entry: {
     core: './src/core.ts',
-    helpers: './src/helpers.ts',
+    common: './src/common.ts'
   },
   format: ['esm', 'cjs'],
   dts: { resolve: true },

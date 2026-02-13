@@ -1,5 +1,5 @@
 import { type FunctionPlugin } from 'vue';
-import { Nav } from '../helpers';
+import { Nav } from '../common/nav';
 import { generateRouterFacade } from './facade';
 import { RootRegistry } from './internals';
 import type { PluginOptions } from './types';

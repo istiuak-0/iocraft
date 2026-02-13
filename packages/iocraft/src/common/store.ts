@@ -2,13 +2,13 @@ import { reactive, computed, watch, watchEffect, type ComputedRef, type WatchSto
 
 export function Store<T extends Record<string, any>>(initialState: T) {
   const state = reactive(initialState) as T;
-  const initial = structuredClone(initialState);
+  const initial = initialState;
 
   return class {
     readonly state = state;
 
     get snapshot(): T {
-      return structuredClone(toRaw(state));
+      return toRaw(state);
     }
 
     update(changes: Partial<T>): void {
@@ -49,7 +49,7 @@ export function Store<T extends Record<string, any>>(initialState: T) {
     }
 
     reset(): void {
-      Object.assign(state, structuredClone(initial));
+      Object.assign(state, initial);
     }
   };
 }
