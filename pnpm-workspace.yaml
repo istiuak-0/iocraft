@@ -1,2 +1,4 @@
 packages:
   - "packages/*"
+catalog:
+  vite: ^7.3.0
