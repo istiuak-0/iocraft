@@ -7,41 +7,51 @@ export default defineConfig({
 	integrations: [
 		starlight({
 			title: 'iocraft',
-			titleDelimiter:'-',
+			titleDelimiter: '-',
 			social: [{ icon: 'github', label: 'GitHub', href: 'https://github.com/istiuak-0/iocraft' }],
 			sidebar: [
 				{
 					label: 'Getting Started',
-					items: [
-						{
-							label: 'Introduction',
-							slug: 'guides/get-started/intro'
-						},
-						{
-							label: 'Quick Start',
-							slug: 'guides/get-started/quick-start'
-						}
-					]
+					slug: 'get-started'
 				},
-
 				{
-					label: 'Core Concepts',
+					label: 'Guides',
 					items: [
-						{ label: 'Services & Registration', slug: 'guides/core/services' },
-						{ label: 'Dependency Injection', slug: 'guides/core/injection' },
-						{ label: 'Lifecycle Hooks', slug: 'guides/core/lifecycle' },
-						{ label: 'Context Sharing', slug: 'guides/core/context' },
+						{ label: 'Services', slug: 'guides/services' },
+						{ label: 'Dependency Injection', slug: 'guides/injection' },
+						{ label: 'Lifecycle Hooks', slug: 'guides/lifecycle' },
+						{ label: 'Context Sharing', slug: 'guides/context' },
 					],
 				},
-
 				{
 					label: 'Common Utilities',
 					items: [
-						{ label: 'Store Helper', slug: 'guides/common/store' },
-						{ label: 'Resource Management', slug: 'guides/common/resource' },
-						{ label: 'Navigation Service', slug: 'guides/common/navigation' },
+						{ label: 'Store Helper', slug: 'common/store' },
+						{ label: 'Resource Management', slug: 'common/resource' },
+						{ label: 'Navigation Service', slug: 'common/navigation' },
 					],
 				},
+				{
+					label: 'Reference',
+					items: [
+						{
+							label: 'obtainers reference',
+							slug: 'reference/obtainer'
+						},
+						{
+							label: 'store reference',
+							slug: 'reference/store'
+						},
+						{
+							label: 'plugin reference',
+							slug: 'reference/plugin'
+						},
+						{
+							label: 'resource reference',
+							slug: 'reference/resource'
+						}
+					]
+				}
 			],
 		}),
 	],
