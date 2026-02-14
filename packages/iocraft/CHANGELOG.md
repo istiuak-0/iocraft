@@ -1,5 +1,15 @@
 # Changelog
 
+## [0.2.6](https://github.com/istiuak-0/iocraft/compare/v0.2.5...v0.2.6) (2026-02-14)
+
+
+### Features
+
+* **resource:** introduce defineResource API and core implementation ([3fd6aaf](https://github.com/istiuak-0/iocraft/commit/3fd6aaf840637601f44ce54211aa0dd7e07e026c))
+* **resource:** introduce new resource management system ([295baf3](https://github.com/istiuak-0/iocraft/commit/295baf36dbbaad2ff8294205b007e6d8b9641a2e))
+* **resource:** introduce resource management utility ([81eb993](https://github.com/istiuak-0/iocraft/commit/81eb99351dc7be4dc70226f18b3b337ef8fff771))
+* **resource:** introduce unified Resource API and update project context ([3148d6b](https://github.com/istiuak-0/iocraft/commit/3148d6ba29cc8c1617d9ddcffeaf97fd9c43cbf7))
+
 ## [0.2.5](https://github.com/istiuak-0/iocraft/compare/v0.2.4...v0.2.5) (2026-02-08)
 
 
