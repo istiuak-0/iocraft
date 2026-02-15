@@ -1,29 +1,26 @@
 ---
-# https://brenoepics.github.io/vitepress-carbon/guide/home-component.html
-layout: home
-
 hero:
-  name: "My Awesome Project"
-  text: "A VitePress Site"
-  tagline: My great project tagline
-  icon: 🛠️
+  name: "iocraft"
+  text: "Dependency Injection for Vue 3"
+  tagline: A lightweight IOC container leveraging the Composition API
+  # icon: 🛠️
   image:
     src: ./bg.svg
     alt: Banner
   actions:
     - theme: brand
-      text: Markdown Examples
-      link: /markdown-examples
+      text: Get Started
+      link: /introduction/getting-started
     - theme: alt
-      text: API Examples
-      link: /api-examples
+      text: View on GitHub
+      link: https://github.com/istiuak-0/iocraft
 
 features:
-  - title: Feature A
-    details: Lorem ipsum dolor sit amet, consectetur adipiscing elit
-  - title: Feature B
-    details: Lorem ipsum dolor sit amet, consectetur adipiscing elit
-  - title: Feature C
-    details: Lorem ipsum dolor sit amet, consectetur adipiscing elit
+  - title: Simple DI
+    details: Easy service registration and injection with decorators
+  - title: Vue Integration
+    details: Seamless integration with Vue 3 Composition API and lifecycle hooks
+  - title: Reactive by Default
+    details: Preserves Vue's reactivity system when destructuring services
 ---
 

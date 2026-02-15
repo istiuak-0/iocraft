@@ -58,7 +58,7 @@
     "tsup": "^8.5.1",
     "typescript": "~5.9.3",
     "vitest": "^4.0.16",
-    "vue": "^3.5.26",
+    "vue": "catalog:",
     "vue-router": "^4.6.4"
   },
   "engines": {

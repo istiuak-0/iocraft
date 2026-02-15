@@ -9,6 +9,9 @@ catalogs:
     vite:
       specifier: ^7.3.0
       version: 7.3.0
+    vue:
+      specifier: ^3.5.26
+      version: 3.5.26
 
 importers:
 
@@ -29,6 +32,9 @@ importers:
       vitepress-carbon:
         specifier: ^1.5.0
         version: 1.5.0(@algolia/client-search@5.48.1)(focus-trap@7.8.0)(search-insights@2.17.3)(typescript@5.9.3)
+      vue:
+        specifier: 'catalog:'
+        version: 3.5.26(typescript@5.9.3)
 
   packages/iocraft:
     devDependencies:
@@ -42,7 +48,7 @@ importers:
         specifier: ^4.0.16
         version: 4.0.16(@types/node@25.2.0)(jiti@2.6.1)(lightningcss@1.30.2)
       vue:
-        specifier: ^3.5.26
+        specifier: 'catalog:'
         version: 3.5.26(typescript@5.9.3)
       vue-router:
         specifier: ^4.6.4
