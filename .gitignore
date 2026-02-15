@@ -15,7 +15,6 @@ coverage
 dist
 cache
 .astro
-
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
