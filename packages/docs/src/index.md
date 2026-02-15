@@ -1,4 +1,6 @@
 ---
+layout: home
+
 hero:
   name: "iocraft"
   text: "Dependency Injection for Vue 3"

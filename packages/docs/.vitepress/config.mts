@@ -7,8 +7,7 @@ export default defineConfigWithTheme<ThemeConfig>({
   title: "iocraft",
   description: "A lightweight dependency injection container for Vue 3",
   srcDir: 'src',
-  appearance: false,
-
+  appearance: 'dark',
   themeConfig: {
     nav: [
       { text: 'Home', link: '/' },

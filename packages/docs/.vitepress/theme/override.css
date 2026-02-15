@@ -1,0 +1,11 @@
+:root {
+  --vp-c-bg-alt: var(--vp-c-bg);
+}
+
+.VPSwitchAppearance {
+  display: none !important;
+}
+
+.VPNavBarAppearance {
+  display: none !important;
+}
