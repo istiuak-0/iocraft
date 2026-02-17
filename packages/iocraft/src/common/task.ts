@@ -1,44 +1,16 @@
 import { computed, ref, watch } from "vue"
 
 
-type TaskContext<TFn extends (...args: any[]) => Promise<any>> = {
-  args: Parameters<TFn>
-  data?: Awaited<ReturnType<TFn>>
-  error?: Error
-}
 
-export function task<TFn extends (...args: any[]) => Promise<any>>(option: {
-
-  fn: TFn
-  track?: () => any[]
-
-  lazy?: boolean
-  debounce?: number
-  throttle?: number
+export function task<TFn extends TaskFn>(option: TaskOptionsWithSignal<TFn>): TaskReturnWithSignal<TFn>
+export function task<TFn extends TaskFn>(option: TaskOptionsWithoutSignal<TFn>): TaskReturnWithoutSignal<TFn>
+export function task<TFn extends TaskFn>(option: TaskOptionsWithSignal<TFn> | TaskOptionsWithoutSignal<TFn>): TaskReturnWithSignal<TFn> | TaskReturnWithoutSignal<TFn> {
 
 
-  onLoading?: (ctx: TaskContext<TFn>) => void
-  onSuccess?: (ctx: TaskContext<TFn> & { data: Awaited<ReturnType<TFn>> }) => void
-  onError?: (ctx: TaskContext<TFn> & { error: Error }) => void
-  onFinally?: (ctx: TaskContext<TFn>) => void
-  rollback?: (ctx: TaskContext<TFn> & { error: Error }) => void
-}) {
-
-  const {
-    fn,
-    track,
-    lazy = true,
-    onError,
-    onLoading,
-    onSuccess,
-    onFinally,
-    rollback
-  } = option;
-
-  type TData = Awaited<ReturnType<TFn>>
 
 
-  const data = ref<TData | undefined>()
+
+  const data = ref<TData<TFn> | undefined>()
   const error = ref<Error | undefined>()
   const status = ref<'loading' | 'error' | 'idle' | 'success'>('idle')
 
@@ -49,85 +21,21 @@ export function task<TFn extends (...args: any[]) => Promise<any>>(option: {
 
 
   const initialized = ref(false)
-  let abortController: AbortController | null = null
 
+  function start() {
 
-
-
-  async function start(...args: Parameters<TFn>): Promise<TData> {
-
-  if (initialized.value) {
-
-    if (__DEV__) {
-      console.info(
-        '[task] Already initialized. Use run() for repeated execution.',
-        { fn: fn.name || 'anonymous', status: status.value }
-      )
-    }
-
-
-    if (data.value !== undefined) {
-      return data.value
-    }
-  }
-  
-  initialized.value = true
-  return execute(...args)
   }
 
 
-  async function run(...args: Parameters<TFn>) {
-    return await execute(...args)
+  function run() {
+
   }
-
-
-
-  async function execute(...args: Parameters<TFn>) {
-    try {
-      status.value = 'loading'
-      error.value = undefined
-      onLoading?.({ args })
-      const result = await fn(...args)
-      data.value = result
-      status.value = 'success'
-      onSuccess?.({ args, data: result })
-      return result;
-
-    } catch (err) {
-      const e = err instanceof Error ? err : new Error(String(err))
-      error.value = e
-      status.value = 'error'
-      onError?.({ args, error: e })
-      rollback?.({ args, error: e })
-      throw err;
-
-    } finally {
-      onFinally?.({ args, data: data.value, error: error.value })
-    }
-  }
-
-
-  function stop() {
-    if (abortController) {
-      abortController.abort()
-      abortController = null
-    }
-    status.value = 'idle'
-  }
-
 
   function clear() {
-    data.value = undefined
-    error.value = undefined
-    status.value = 'idle'
-    initialized.value = false
+
   }
 
-
-  if (track && !lazy) {
-    watch(track, (deps) => {
-
-    }, { immediate: true })
+  function stop() {
 
   }
 
@@ -146,3 +54,101 @@ export function task<TFn extends (...args: any[]) => Promise<any>>(option: {
     clear
   }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// async function execute(...args: UserParams<TFn>): Promise<TData> {
+
+//   const executionId = ++currentExecutionId;
+//   let signal: AbortSignal | undefined
+
+//   if (hasSignal) {
+//     if (abortController) {
+//       abortController.abort('Superseded by new execution')
+//     }
+//     abortController = new AbortController()
+//     signal = abortController.signal
+//   }
+
+
+//   try {
+//     status.value = 'loading'
+//     error.value = undefined
+//     onLoading?.({ args: args as Parameters<TFn> })
+
+//     const callArgs = hasSignal ? [...args, signal] : args
+
+//     const result = await fn(...callArgs as any)
+
+
+//     if (executionId !== currentExecutionId) {
+//       if (__DEV__) {
+//         console.info('[task] Stale execution ignored', {
+//           fn: fn.name || 'anonymous',
+//           executionId,
+//           currentExecutionId
+//         })
+//       }
+//       return result
+//     }
+
+//     data.value = result
+//     status.value = 'success'
+//     onSuccess?.({ args: args as Parameters<TFn>, data: result })
+//     return result
+
+//   } catch (err) {
+//     if (executionId !== currentExecutionId) return undefined as TData
+//     if (err instanceof DOMException && err.name === 'AbortError') {
+//       status.value = 'idle'
+//       if (__DEV__) {
+//         console.info('[task] Execution aborted', { fn: fn.name || 'anonymous' })
+//       }
+//       throw err
+//     }
+
+//     const e = err instanceof Error ? err : new Error(String(err))
+//     error.value = e
+//     status.value = 'error'
+//     onError?.({ args: args as Parameters<TFn>, error: e })
+//     rollback?.({ args: args as Parameters<TFn>, error: e })
+//     throw e
+
+//   } finally {
+//     if (executionId === currentExecutionId) {
+//       onFinally?.({ args: args as Parameters<TFn>, data: data.value, error: error.value })
+//       if (hasSignal) abortController = null
+//     }
+//   }
+// }
