@@ -1,10 +1,16 @@
-type AsyncFn<TArgs extends any[], TResult> =
-  (...args: TArgs) => Promise<TResult>
-
+type AsyncFn<TArgs extends any[], TResult> = (...args: TArgs) => Promise<TResult>
 type TaskStatus = 'idle' | 'loading' | 'success' | 'error'
 
+interface RetryConfig {
+  count: number
+  delay?: number
+  backoff?: boolean
+}
 
-
+interface ErrorContext {
+  attempt: number
+  willRetry: boolean
+}
 
 
 
@@ -13,11 +19,12 @@ interface TaskOptions<TArgs extends any[], TResult> {
 
   lazy?: boolean
   debounce?: number
-  track?: () => any[]
+  track?: () => TArgs
+  retry: number | RetryConfig
 
   onLoading?: (args: TArgs) => void
   onSuccess?: (args: TArgs, data: TResult) => void
-  onError?: (args: TArgs, error: Error) => void
+  onError?: (args: TArgs, error: Error, context: ErrorContext) => void
   onFinally?: (args: TArgs, data?: TResult, error?: Error) => void
 }
 
@@ -41,4 +48,5 @@ interface TaskReturn<TArgs extends any[], TResult> {
   start: (...args: TArgs) => Promise<TResult | undefined>
   run: (...args: TArgs) => Promise<TResult | undefined>
   clear: () => void
+  reset: () => void
 }
