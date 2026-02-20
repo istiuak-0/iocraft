@@ -1,5 +1,5 @@
-type AsyncFn<TArgs extends any[], TResult> = (...args: TArgs) => Promise<TResult>
 type TaskStatus = 'idle' | 'loading' | 'success' | 'error'
+type AsyncFn = (...args: unknown[]) => Promise<unknown>
 
 interface RetryConfig {
   count: number
@@ -14,18 +14,18 @@ interface ErrorContext {
 
 
 
-interface TaskOptions<TArgs extends any[], TResult> {
-  fn: AsyncFn<TArgs, TResult>
+interface TaskOptions<TFn extends AsyncFn> {
+  fn: TFn
 
   lazy?: boolean
   debounce?: number
-  track?: () => TArgs
-  retry: number | RetryConfig
+  track?: () => Parameters<TFn>
+  retry:RetryConfig
 
-  onLoading?: (args: TArgs) => void
-  onSuccess?: (args: TArgs, data: TResult) => void
-  onError?: (args: TArgs, error: Error, context: ErrorContext) => void
-  onFinally?: (args: TArgs, data?: TResult, error?: Error) => void
+  onLoading?: () => void
+  onSuccess?: (data: Awaited<ReturnType<TFn>>) => void
+  onError?: (error: Error) => void
+  onFinally?: (result: { data?: Awaited<ReturnType<TFn>>, error?: Error }) => void
 }
 
 
@@ -33,8 +33,8 @@ interface TaskOptions<TArgs extends any[], TResult> {
 
 
 
-interface TaskReturn<TArgs extends any[], TResult> {
-  data: Ref<TResult | undefined>
+interface TaskReturn<TFn extends AsyncFn> {
+  data: Ref<Awaited<ReturnType<TFn>> | undefined>
   error: Ref<Error | undefined>
   status: Ref<TaskStatus>
 
@@ -42,11 +42,10 @@ interface TaskReturn<TArgs extends any[], TResult> {
   isIdle: ComputedRef<boolean>
   isSuccess: ComputedRef<boolean>
   isError: ComputedRef<boolean>
-
   initialized: Ref<boolean>
 
-  start: (...args: TArgs) => Promise<TResult | undefined>
-  run: (...args: TArgs) => Promise<TResult | undefined>
+  start: (...args: Parameters<TFn>) => Promise<Awaited<ReturnType<TFn>> | undefined>
+  run: (...args: Parameters<TFn>) => Promise<Awaited<ReturnType<TFn>> | undefined>
   clear: () => void
   reset: () => void
 }

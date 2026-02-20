@@ -49,6 +49,7 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest",
     "bench": "vitest bench"
+    
   },
   "peerDependencies": {
     "vue": "^3.0.0",
