@@ -1,232 +1,200 @@
-import { computed, ref, watch } from "vue"
+import { computed, ref, watch } from "vue";
 
-// ----  internal utils ----
-const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms))
-const controllerRegistry = new Map<Primitives, AbortController>()
+const controllerRegistry = new Map<Primitives, AbortController>();
 
-
-
-
-
-
-/**
- * This is a wrapper around Abort Controller
- * This Function creates a AbortController And Registers It In Internal Registry for later used
- * Its necessary for stopping the request 
- *
- * @export
- * @param {Primitives} key 
- * @returns {AbortController} 
- */
 export function abortable(key: Primitives): AbortController {
   if (controllerRegistry.has(key)) {
-    controllerRegistry.delete(key)
+    controllerRegistry.delete(key);
   }
   const controller = new AbortController();
-  controllerRegistry.set(key, controller)
-  return controller
+  controllerRegistry.set(key, controller);
+  return controller;
 }
 
+/**
+ * Description placeholder
+ *
+ * @export
+ * @class Task
+ * @typedef {Task}
+ * @template {AsyncFn} TFn
+ */
+export class Task<TFn extends AsyncFn> {
+  // === public reactive states ===
+  readonly data = ref<Awaited<ReturnType<TFn>> | undefined>();
+  readonly error = ref<Error | undefined>();
+  readonly status = ref<TaskStatus>("idle");
+  readonly isLoading = computed(() => this.status.value === "loading");
+  readonly isIdle = computed(() => this.status.value === "idle");
+  readonly isError = computed(() => this.status.value === "error");
+  readonly isSuccess = computed(() => this.status.value === "success");
+  readonly initialized = ref(false);
 
-export function task<TFn extends AsyncFn>(options: TaskOptions<TFn>): TaskReturn<TFn> {
-  type Result = Awaited<ReturnType<TFn>>
-  type Arguments = Parameters<TFn>
+  // === private internals ===
+  private currentExecutionId = 0;
+  private debounceTimer: ReturnType<typeof setTimeout> | undefined;
+  private stopWatch: (() => void) | undefined;
 
+  constructor(private options: TaskOptions<TFn>) {
+    this.setupTracking();
+  }
 
-  // ---- resource states ----
-  const data = ref<Result | undefined>()
-  const error = ref<Error | undefined>()
-  const status = ref<TaskStatus>('idle')
+  // === private helpers ===
+  private setupTracking() {
+    const { track, lazy } = this.options;
+    if (!track) return;
 
-  const isLoading = computed(() => status.value === 'loading')
-  const isIdle = computed(() => status.value === 'idle')
-  const isError = computed(() => status.value === 'error')
-  const isSuccess = computed(() => status.value === 'success')
+    this.stopWatch = watch(track, (newArgs) => this.run(...newArgs), {
+      immediate: !lazy,
+    });
+  }
 
-  const initialized = ref(false)
+  private sleep(ms: number) {
+    return new Promise((resolve) => setTimeout(resolve, ms));
+  }
 
+  private abortPrevious() {
+    if (this.options.key) {
+      controllerRegistry.get(this.options.key)?.abort();
+    }
+  }
 
+  private getRetryDelay(attempt: number): number | null {
+    const retry = this.options.retry;
 
+    if (!retry?.delay || attempt <= 0) {
+      return null;
+    }
 
+    if (!retry.backoff) {
+      return retry.delay;
+    }
 
+    return retry.delay * 2 ** (attempt - 1);
+  }
 
-  async function attemptWithRetry(...args: Arguments): Promise<[Result | undefined, Error | undefined]> {
-
-    const maxAttempts = options.retry ? options.retry.count + 1 : 1
-    let lastError: Error | undefined
-
+  private async attemptWithRetry(...args: Parameters<TFn>): Promise<TaskResult<TFn>> {
+    const maxAttempts = this.options.retry ? this.options.retry.count + 1 : 1;
+    let lastError: Error | undefined;
 
     for (let attempt = 0; attempt < maxAttempts; attempt++) {
+      if (attempt > 0 && this.options.retry?.delay) {
+        const delay = this.getRetryDelay(attempt);
 
-      if (attempt > 0 && options.retry?.delay) {
-        const delay = options.retry.backoff
-          ? options.retry.delay * 2 ** (attempt - 1)  // 1s, 2s, 4s, 8s...
-          : options.retry.delay                         // always same delay
-
-        await sleep(delay)
+        if (delay !== null) {
+          await this.sleep(delay);
+        }
       }
-
 
       try {
-        const result = await options.fn(...args) as Result
-        return [result, undefined]
+        const result = (await this.options.fn(...args)) as Awaited<ReturnType<TFn>>;
+        return [result, undefined];
       } catch (e) {
-        lastError = e instanceof Error ? e : new Error(String(e))
+        if (e instanceof DOMException && e.name === "AbortError") {
+          return [undefined, undefined];
+        }
+        lastError = e instanceof Error ? e : new Error(String(e));
       }
     }
 
-    return [undefined, lastError]
+    return [undefined, lastError];
   }
 
-
-
-
-
-  // ---- This is the main execution function ----
-
-  let currentExecutionId = 0 // Execution tracking for race condition prevention
-
-  async function execute(...args: Arguments): Promise<[Result | undefined, Error | undefined]> {
-    const executionId = ++currentExecutionId
-
-    if (options.key) {
-      controllerRegistry.get(options.key)?.abort()
-    }
-
+  private async execute(...args: Parameters<TFn>): Promise<TaskResult<TFn>> {
+    const executionId = ++this.currentExecutionId;
+    this.abortPrevious();
 
     try {
+      this.status.value = "loading";
+      this.error.value = undefined;
+      this.options.onLoading?.();
 
-      status.value = 'loading'
-      error.value = undefined
-      options.onLoading?.()
-
-      const [result, retryError] = await attemptWithRetry(...args)
-      if (executionId !== currentExecutionId) return [undefined, undefined]
-
+      const [result, retryError] = await this.attemptWithRetry(...args);
+      if (executionId !== this.currentExecutionId) {
+        return [undefined, undefined];
+      }
 
       if (retryError) {
-        error.value = retryError;
-        status.value = 'error'
-        options.onError?.(retryError)
-        return [undefined, retryError]
+        this.error.value = retryError;
+        this.status.value = "error";
+        this.options.onError?.(retryError);
+        return [undefined, retryError];
       }
 
-      data.value = result
-      status.value = 'success'
-      options.onSuccess?.(result!)
-      return [result, undefined]
-
+      this.data.value = result;
+      this.status.value = "success";
+      this.options.onSuccess?.(result!);
+      return [result, undefined];
     } finally {
-
-      if (executionId === currentExecutionId) {
-        options.onFinally?.({ data: data.value, error: error.value })
+      if (executionId === this.currentExecutionId) {
+        this.options.onFinally?.({
+          data: this.data.value,
+          error: this.error.value,
+        });
       }
-
     }
   }
 
+  // === public methods ===
 
+  async run(...args: Parameters<TFn>): Promise<TaskResult<TFn>> {
 
-
-
-
-
-
-  let debounceTimer: ReturnType<typeof setTimeout> | undefined
-
-  async function run(...args: Arguments): Promise<[Result | undefined, Error | undefined]> {
-    if (options.debounce) {
+    if (this.options.debounce) {
       return new Promise((resolve) => {
-        clearTimeout(debounceTimer)
-        debounceTimer = setTimeout(() => resolve(execute(...args)), options.debounce)
-      })
-    }
-    return execute(...args)
-  }
-
-
-
-
-
-  async function start(...args: Arguments): Promise<[Result | undefined, Error | undefined]> {
-    if (initialized.value) {
-      return [data.value, error.value]  // return current state as tuple
+        clearTimeout(this.debounceTimer);
+        this.debounceTimer = setTimeout(() => resolve(this.execute(...args)), this.options.debounce);
+      });
     }
 
-    initialized.value = true
-    return execute(...args)
+    return this.execute(...args);
+
   }
 
-
-
-
-  function clear(): void {
-    currentExecutionId++
-    data.value = undefined
-    error.value = undefined
-    status.value = 'idle'
+  async start(...args: Parameters<TFn>): Promise<TaskResult<TFn>> {
+    if (this.initialized.value) {
+      return [this.data.value, this.error.value];
+    }
+    this.initialized.value = true;
+    return this.execute(...args);
   }
 
-
-  function reset(): void {
-    currentExecutionId++
-    data.value = undefined
-    error.value = undefined
-    status.value = 'idle'
-    initialized.value = false
+  stop(): void {
+    if (!this.options.key) {
+      console.warn("[Task] stop() requires a key — use abortable() to register one");
+      return;
+    }
+    controllerRegistry.get(this.options.key)?.abort();
+    controllerRegistry.delete(this.options.key);
+    this.status.value = "idle";
+    this.currentExecutionId++;
   }
 
-
-
-
-  // --- track reactive data ----
-  let stopWatch: (() => void) | undefined
-
-  if (options.track) {
-    stopWatch = watch(options.track, (newArgs) => {
-      run(...newArgs)
-    }, { immediate: !options.lazy })
+  clear(): void {
+    this.currentExecutionId++;
+    this.data.value = undefined;
+    this.error.value = undefined;
+    this.status.value = "idle";
   }
 
+  reset(): void {
+    this.currentExecutionId++;
+    this.data.value = undefined;
+    this.error.value = undefined;
+    this.status.value = "idle";
+    this.initialized.value = false;
+  }
 
-  function dispose(): void {
-    currentExecutionId++
-    clearTimeout(debounceTimer)
-    debounceTimer = undefined
-    stopWatch?.()
+  dispose(): void {
+    this.currentExecutionId++;
+    clearTimeout(this.debounceTimer);
+    this.debounceTimer = undefined;
+    this.stopWatch?.();
 
-    if (options.key) {
-      controllerRegistry.get(options.key)?.abort()
-      controllerRegistry.delete(options.key)
+    if (this.options.key) {
+      controllerRegistry.get(this.options.key)?.abort();
+      controllerRegistry.delete(this.options.key);
     }
 
-  }
-
-
-
-
-  function stop() {
-    if (options.key) {
-      controllerRegistry.get(options.key)?.abort()
-    }
-  }
-
-
-
-  return {
-    data,
-    error,
-    status,
-    isLoading,
-    isIdle,
-    isSuccess,
-    isError,
-    initialized,
-    start,
-    run,
-    clear,
-    reset,
-    dispose,
-    stop
+    this.status.value = "idle";
   }
 }

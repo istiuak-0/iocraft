@@ -2,13 +2,12 @@ type TaskStatus = 'idle' | 'loading' | 'success' | 'error'
 type AsyncFn = (...args: unknown[]) => Promise<unknown>
 type TaskResult<TFn extends AsyncFn> = [Awaited<ReturnType<TFn>> | undefined, Error | undefined]
 
-type Primitives = string | number | boolean | symbol
+type Primitives = string | number | symbol
 interface RetryConfig {
   count: number
   delay?: number
   backoff?: boolean
 }
-
 
 
 interface TaskOptions<TFn extends AsyncFn> {
@@ -18,6 +17,8 @@ interface TaskOptions<TFn extends AsyncFn> {
   lazy?: boolean
   debounce?: number
   retry?: RetryConfig
+  timeout:number
+  polling:number
   track?: () => Parameters<TFn>
 
   onLoading?: () => void
