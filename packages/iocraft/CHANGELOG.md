@@ -1,5 +1,20 @@
 # Changelog
 
+## [0.2.6](https://github.com/istiuak-0/iocraft/compare/v0.2.5...v0.2.6) (2026-02-24)
+
+
+### Features
+
+* **common:** introduce task composable for async operations ([c5d1999](https://github.com/istiuak-0/iocraft/commit/c5d1999d130f9e374909654dfd85cbcc6165ae05))
+* **resource:** introduce defineResource API and core implementation ([3fd6aaf](https://github.com/istiuak-0/iocraft/commit/3fd6aaf840637601f44ce54211aa0dd7e07e026c))
+* **resource:** introduce new resource management system ([295baf3](https://github.com/istiuak-0/iocraft/commit/295baf36dbbaad2ff8294205b007e6d8b9641a2e))
+* **resource:** introduce resource management utility ([81eb993](https://github.com/istiuak-0/iocraft/commit/81eb99351dc7be4dc70226f18b3b337ef8fff771))
+* **resource:** introduce unified Resource API and update project context ([3148d6b](https://github.com/istiuak-0/iocraft/commit/3148d6ba29cc8c1617d9ddcffeaf97fd9c43cbf7))
+* **task, playground:** introduce task utility for async state management ([8479868](https://github.com/istiuak-0/iocraft/commit/8479868f406d6925a115f58f492644cd9731c6e4))
+* **task:** add retry, debounce, abort, and dispose capabilities ([caa33dd](https://github.com/istiuak-0/iocraft/commit/caa33dd29f34541d8a36cbb1bebe4f73adef96ec))
+* **task:** implement advanced execution logic for task utility ([cdfd4d6](https://github.com/istiuak-0/iocraft/commit/cdfd4d65ad4655ca80392b35e469a908daaffc70))
+* **task:** implement core functionality and simplify API ([0c5f63c](https://github.com/istiuak-0/iocraft/commit/0c5f63cfdc0d3656bab9f8287d9f92f1cb983240))
+
 ## [0.2.5](https://github.com/istiuak-0/iocraft/compare/v0.2.4...v0.2.5) (2026-02-08)
 
 
