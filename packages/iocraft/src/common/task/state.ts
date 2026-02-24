@@ -12,5 +12,30 @@ export function createTaskState<TFn extends AsyncFn>() {
   const isError = computed(() => status.value === "error");
   const isSuccess = computed(() => status.value === "success");
 
-  return { data, error, status, initialized, isLoading, isIdle, isError, isSuccess };
+  function setLoading() { status.value = "loading"; }
+  function setIdle() { status.value = "idle"; }
+  function setSuccess(result: Awaited<ReturnType<TFn>> | undefined) {
+    data.value = result;
+    status.value = "success";
+  }
+  function setError(e: Error) {
+    error.value = e;
+    status.value = "error";
+  }
+  function clearTransients() {
+    data.value = undefined;
+    error.value = undefined;
+  }
+  function reset() {
+    data.value = undefined;
+    error.value = undefined;
+    status.value = "idle";
+    initialized.value = false;
+  }
+
+  return {
+    data, error, status, initialized,
+    isLoading, isIdle, isError, isSuccess,
+    setLoading, setIdle, setSuccess, setError, clearTransients, reset,
+  };
 }

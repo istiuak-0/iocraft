@@ -13,7 +13,6 @@ export interface RetryConfig {
 
 export interface PollingConfig {
   interval: number;
-  backoff?: boolean;
 }
 
 export interface TaskOptions<TFn extends AsyncFn> {

@@ -1,42 +1,40 @@
-import { Aborter } from "./abort";
-import { Executor } from "./execution";
-import { Retry } from "./retry";
-import { createTaskState, State } from "./state";
-import { Timer } from "./timer";
+import { watch } from "vue";
+import { createExecution } from "./execution";
+import { createTaskState } from "./state";
 import type { AsyncFn, TaskOptions, TaskReturn } from "./types";
-
 
 export function task<TFn extends AsyncFn>(options: TaskOptions<TFn>): TaskReturn<TFn> {
   const state = createTaskState<TFn>();
+  const execution = createExecution(options, state);
 
-  const abort = new Aborter();
-  const timer = new Timer();
-  const retry = new Retry(options.retry);
+  let stopWatch: (() => void) | undefined;
 
-  const executor = new Executor(options, state, abort, timer, retry);
-  const watcher = new Watcher(options, executor);
+  function setupWatch() {
+    if (!options.track || stopWatch) return;
+    stopWatch = watch(options.track, (newArgs) => execution.run(...newArgs), { immediate: false });
+  }
 
   if (!options.lazy) {
-    watcher.setup();
-    executor.start(...((options.initialArgs ?? []) as Parameters<TFn>));
+    setupWatch();
+    execution.start(...((options.initialArgs ?? []) as Parameters<TFn>));
   }
 
   return {
     ...state,
     start: (...args) => {
-      if (!state.initialized.value) watcher.setup();
-      return executor.start(...args);
+      if (!state.initialized.value) setupWatch();
+      return execution.start(...args);
     },
     run: (...args) => {
-      if (!state.initialized.value) watcher.setup();
-      return executor.run(...args);
+      if (!state.initialized.value) setupWatch();
+      return execution.run(...args);
     },
-    stop: () => executor.stop(),
-    clear: () => executor.clear(),
-    reset: () => executor.reset(),
+    stop: () => execution.stop(),
+    clear: () => execution.clear(),
+    reset: () => execution.reset(),
     dispose: () => {
-      watcher.dispose();
-      executor.dispose();
+      stopWatch?.();
+      execution.dispose();
     },
   };
 }
