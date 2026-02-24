@@ -6,35 +6,33 @@ import { Timer } from "./timer";
 import type { AsyncFn, TaskOptions, TaskResult, TaskReturn } from "./types";
 
 export class Task<TFn extends AsyncFn> implements TaskReturn<TFn> {
-  private readonly state: State<TFn>;
+
+  // Flattening the states so its easier to use and don't require deep nesting
+  private readonly state = new State<TFn>();
+
+  readonly data = this.state.data;
+  readonly error = this.state.error;
+  readonly status = this.state.status;
+  readonly isLoading = this.state.isLoading;
+  readonly isIdle = this.state.isIdle;
+  readonly isError = this.state.isError;
+  readonly isSuccess = this.state.isSuccess;
+  readonly initialized = this.state.initialized;
+
+
+
+
+
+
   private readonly abort: Aborter;
   private readonly timer: Timer;
   private readonly retry: Retry;
   private stopWatch: (() => void) | undefined;
 
-  readonly data: State<TFn>["data"];
-  readonly error: State<TFn>["error"];
-  readonly status: State<TFn>["status"];
-  readonly isLoading: State<TFn>["isLoading"];
-  readonly isIdle: State<TFn>["isIdle"];
-  readonly isError: State<TFn>["isError"];
-  readonly isSuccess: State<TFn>["isSuccess"];
-  readonly initialized: State<TFn>["initialized"];
-
   constructor(private readonly options: TaskOptions<TFn>) {
-    this.state = new State<TFn>();
     this.abort = new Aborter();
     this.timer = new Timer();
     this.retry = new Retry(options.retry);
-
-    this.data = this.state.data;
-    this.error = this.state.error;
-    this.status = this.state.status;
-    this.isLoading = this.state.isLoading;
-    this.isIdle = this.state.isIdle;
-    this.isError = this.state.isError;
-    this.isSuccess = this.state.isSuccess;
-    this.initialized = this.state.initialized;
 
     if (!options.lazy) {
       this.start(...((options.initialArgs ?? []) as Parameters<TFn>));

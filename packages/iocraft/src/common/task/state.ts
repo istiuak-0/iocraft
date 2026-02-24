@@ -1,6 +1,14 @@
 import { computed, ref } from "vue";
 import type { AsyncFn, TaskStatus } from "./types";
 
+/**
+ * This Holds The Resource States And Necessary Internal Methods To Update Them
+ *
+ * @export
+ * @class State
+ * @typedef {State}
+ * @template {AsyncFn} TFn
+ */
 export class State<TFn extends AsyncFn> {
   readonly data = ref<Awaited<ReturnType<TFn>> | undefined>();
   readonly error = ref<Error | undefined>();
