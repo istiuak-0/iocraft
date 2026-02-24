@@ -2,6 +2,10 @@ import type { Primitives } from "./types";
 
 const registry = new Map<Primitives, AbortController>();
 
+/**
+ * Manages abort controllers for canceling in-flight requests.
+ * Tracks request IDs to ignore stale responses.
+ */
 export class Aborter {
   private currentId = 0;
 
@@ -36,8 +40,14 @@ export class Aborter {
   }
 }
 
-// Pass to fetch() as the signal. Use the same key as your Task.
-// fn: () => fetch("/api/users", { signal: abortable("users").signal })
+/**
+ * Creates or replaces an AbortController for the given key.
+ * Aborts any existing controller for the same key.
+ * @example
+ * ```ts
+ * fetch("/api/users", { signal: abortable("users").signal });
+ * ```
+ */
 export function abortable(key: Primitives): AbortController {
   registry.get(key)?.abort();
   const controller = new AbortController();

@@ -2,12 +2,7 @@ import { computed, ref } from "vue";
 import type { AsyncFn, TaskStatus } from "./types";
 
 /**
- * This Holds The Resource States And Necessary Internal Methods To Update Them
- *
- * @export
- * @class State
- * @typedef {State}
- * @template {AsyncFn} TFn
+ * Manages task state (data, error, status) and provides methods to update them.
  */
 export class State<TFn extends AsyncFn> {
   readonly data = ref<Awaited<ReturnType<TFn>> | undefined>();
@@ -39,14 +34,14 @@ export class State<TFn extends AsyncFn> {
     this.status.value = "idle";
   }
 
-  // Clears data + error, back to idle. Keeps initialized so start() won't re-run.
+  /** Clears data and error, returns to idle. Keeps initialized so start() won't re-run. */
   clear(): void {
     this.data.value = undefined;
     this.error.value = undefined;
     this.status.value = "idle";
   }
 
-  // Full wipe — same as if the Task was just created. start() will run again.
+  /** Full reset to initial state. start() will run again on next trigger. */
   reset(): void {
     this.clear();
     this.initialized.value = false;

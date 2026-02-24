@@ -6,7 +6,6 @@ import { Timer } from "./timer";
 import type { AsyncFn, TaskOptions, TaskResult, TaskReturn } from "./types";
 
 export class Task<TFn extends AsyncFn> implements TaskReturn<TFn> {
-
   // Flattening the states so its easier to use and don't require deep nesting
   private readonly state = new State<TFn>();
 
@@ -19,19 +18,13 @@ export class Task<TFn extends AsyncFn> implements TaskReturn<TFn> {
   readonly isSuccess = this.state.isSuccess;
   readonly initialized = this.state.initialized;
 
+  private readonly abort = new Aborter();
+  private readonly timer = new Timer();
 
-
-
-
-
-  private readonly abort: Aborter;
-  private readonly timer: Timer;
   private readonly retry: Retry;
   private stopWatch: (() => void) | undefined;
 
   constructor(private readonly options: TaskOptions<TFn>) {
-    this.abort = new Aborter();
-    this.timer = new Timer();
     this.retry = new Retry(options.retry);
 
     if (!options.lazy) {
