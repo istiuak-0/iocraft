@@ -2,20 +2,18 @@ import type { createTaskState } from "./state";
 import type { AsyncFn, TaskOptions, TaskResult } from "./types";
 import { abortTask, createDebounce, createPoller, createTimeout, releaseKey, runWithRetry } from "./utils";
 
-
-
 export function createExecution<TFn extends AsyncFn>(options: TaskOptions<TFn>, state: ReturnType<typeof createTaskState<TFn>>) {
+  
   let currentId = 0; // this id is used to prevent race conditions
-  let poller: ReturnType<typeof createPoller> | undefined;
   const debounce = createDebounce();
+  let poller: ReturnType<typeof createPoller>;
 
   async function execute(...args: Parameters<TFn>): Promise<TaskResult<TFn>> {
-    const executionId = ++currentId;
-    abortTask(options.key);
+    const executionId = ++currentId; // update id to keep a unique id
+    abortTask(options.key); // if any task is running with this key stop it
 
-    let timeout: ReturnType<typeof createTimeout> | null = null;
+    let timeout: ReturnType<typeof createTimeout>| undefined=undefined;
 
-    /// Abort the request on timeout
     if (options.timeout) {
       timeout = createTimeout(() => {
         if (!options.key) {
@@ -67,8 +65,6 @@ export function createExecution<TFn extends AsyncFn>(options: TaskOptions<TFn>, 
   }
 
   return {
-    execute,
-
     run(...args: Parameters<TFn>): Promise<TaskResult<TFn>> {
       return options.debounce ? debounce(() => execute(...args), options.debounce) : execute(...args);
     },

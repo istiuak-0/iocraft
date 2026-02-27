@@ -5,7 +5,9 @@ export function createTaskState<TFn extends AsyncFn>() {
   const data = ref<Awaited<ReturnType<TFn>> | undefined>();
   const error = ref<Error | undefined>();
   const status = ref<TaskStatus>("idle");
+
   const initialized = ref(false);
+  const executionId = ref(0);
 
   const isLoading = computed(() => status.value === "loading");
   const isIdle = computed(() => status.value === "idle");
@@ -21,5 +23,6 @@ export function createTaskState<TFn extends AsyncFn>() {
     isIdle,
     isError,
     isSuccess,
+    executionId,
   };
 }

@@ -18,13 +18,15 @@ export interface PollingConfig {
 export interface TaskOptions<TFn extends AsyncFn> {
   key?: Primitives;
   fn: TFn;
-  lazy?: boolean;
   debounce?: number;
   timeout?: number;
-  polling?: PollingConfig;
   retry?: RetryConfig;
-  initialArgs?: Parameters<TFn>;
-  track?: () => Parameters<TFn>;
+  polling?: PollingConfig;
+  watch?: {
+    deps: () => Parameters<TFn>;
+    immediate?: boolean;
+  };
+  
   onLoading?: () => void;
   onSuccess?: (data: Awaited<ReturnType<TFn>>) => void;
   onError?: (error: Error) => void;
@@ -40,7 +42,7 @@ export interface TaskReturn<TFn extends AsyncFn> {
   isSuccess: ComputedRef<boolean>;
   isError: ComputedRef<boolean>;
   initialized: Ref<boolean>;
-  
+
   start: (...args: Parameters<TFn>) => Promise<TaskResult<TFn>>;
   run: (...args: Parameters<TFn>) => Promise<TaskResult<TFn>>;
   stop: () => void;
