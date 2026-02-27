@@ -1,76 +1,55 @@
-import { createDebounce, createPoller, createTimeout } from "./timing";
 import type { createTaskState } from "./state";
-import type { AsyncFn, Primitives, RetryConfig, TaskOptions, TaskResult } from "./types";
-import { abortKey, releaseKey } from "./abort";
+import type { AsyncFn, TaskOptions, TaskResult } from "./types";
+import { abortTask, createDebounce, createPoller, createTimeout, releaseKey, runWithRetry } from "./utils";
 
 
 
-async function runWithRetry<TFn extends AsyncFn>(
-  fn: () => ReturnType<TFn>,
-  config: RetryConfig | undefined,
-): Promise<TaskResult<TFn>> {
-  const maxAttempts = config ? config.count + 1 : 1;
-  let lastError: Error | undefined;
-
-  for (let attempt = 0; attempt < maxAttempts; attempt++) {
-    if (attempt > 0) {
-      const delay = config?.delay
-        ? config.backoff
-          ? config.delay * 2 ** (attempt - 1) // backoff:  100ms, 200ms, 400ms...
-          : config.delay                        // flat:     100ms, 100ms, 100ms...
-        : null;
-      if (delay) await new Promise<void>((resolve) => setTimeout(resolve, delay));
-    }
-
-    try {
-      const result = await fn();
-      return [result as Awaited<ReturnType<TFn>>, undefined];
-    } catch (e) {
-      if (e instanceof DOMException && e.name === "AbortError") return [undefined, undefined];
-      lastError = e instanceof Error ? e : new Error(String(e));
-    }
-  }
-
-  return [undefined, lastError];
-}
-
-export function createExecution<TFn extends AsyncFn>(
-  options: TaskOptions<TFn>,
-  state: ReturnType<typeof createTaskState<TFn>>,
-) {
-  let currentId = 0;
+export function createExecution<TFn extends AsyncFn>(options: TaskOptions<TFn>, state: ReturnType<typeof createTaskState<TFn>>) {
+  let currentId = 0; // this id is used to prevent race conditions
   let poller: ReturnType<typeof createPoller> | undefined;
   const debounce = createDebounce();
 
   async function execute(...args: Parameters<TFn>): Promise<TaskResult<TFn>> {
     const executionId = ++currentId;
-    abortKey(options.key);
+    abortTask(options.key);
 
-    const timeout = options.timeout
-      ? createTimeout(() => {
-          if (!options.key) console.warn("[Task] timeout works best with a key — use abortable() to cancel the request");
-          abortKey(options.key);
-          currentId++;
-          state.setIdle();
-        }, options.timeout)
-      : null;
+    let timeout: ReturnType<typeof createTimeout> | null = null;
+
+    /// Abort the request on timeout
+    if (options.timeout) {
+      timeout = createTimeout(() => {
+        if (!options.key) {
+          console.warn("[Task] timeout works best with a key — use abortable() to cancel the request");
+        }
+
+        abortTask(options.key);
+
+        currentId++;
+
+        state.status.value = "idle";
+        state.error.value = undefined;
+      }, options.timeout);
+    }
 
     try {
-      state.setLoading();
+      state.status.value = "loading";
+      state.error.value = undefined;
       options.onLoading?.();
 
       const [result, error] = await runWithRetry(() => options.fn(...args), options.retry);
 
-      if (executionId !== currentId) return [undefined, undefined]; // stale, discard
+      if (executionId !== currentId) return [undefined, undefined];
 
       if (error) {
-        state.setError(error);
+        state.status.value = "error";
+        state.error.value = error;
         options.onError?.(error);
         return [undefined, error];
       }
 
-      state.setSuccess(result);
-      options.onSuccess?.(result!);
+      state.status.value = "success";
+      state.data.value = result as Awaited<ReturnType<TFn>>;
+      options.onSuccess?.(result as Awaited<ReturnType<TFn>>);
 
       if (options.polling && !poller) {
         poller = createPoller(() => {
@@ -78,7 +57,7 @@ export function createExecution<TFn extends AsyncFn>(
         }, options.polling.interval);
       }
 
-      return [result, undefined];
+      return [result as Awaited<ReturnType<TFn>>, undefined];
     } finally {
       timeout?.clear();
       if (executionId === currentId) {
@@ -91,9 +70,7 @@ export function createExecution<TFn extends AsyncFn>(
     execute,
 
     run(...args: Parameters<TFn>): Promise<TaskResult<TFn>> {
-      return options.debounce
-        ? debounce(() => execute(...args), options.debounce)
-        : execute(...args);
+      return options.debounce ? debounce(() => execute(...args), options.debounce) : execute(...args);
     },
 
     start(...args: Parameters<TFn>): Promise<TaskResult<TFn>> {
@@ -109,17 +86,22 @@ export function createExecution<TFn extends AsyncFn>(
       }
       releaseKey(options.key);
       currentId++;
-      state.setIdle();
+      state.status.value = "idle";
+      state.error.value = undefined;
     },
 
     clear(): void {
       currentId++;
-      state.clearTransients();
+      state.data.value = undefined;
+      state.error.value = undefined;
     },
 
     reset(): void {
       currentId++;
-      state.reset();
+      state.status.value = "idle";
+      state.data.value = undefined;
+      state.error.value = undefined;
+      state.initialized.value = false;
     },
 
     dispose(): void {
@@ -127,7 +109,8 @@ export function createExecution<TFn extends AsyncFn>(
       poller?.stop();
       poller = undefined;
       releaseKey(options.key);
-      state.setIdle();
+      state.status.value = "idle";
+      state.error.value = undefined;
     },
   };
 }

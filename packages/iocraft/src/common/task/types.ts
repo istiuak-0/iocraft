@@ -40,6 +40,7 @@ export interface TaskReturn<TFn extends AsyncFn> {
   isSuccess: ComputedRef<boolean>;
   isError: ComputedRef<boolean>;
   initialized: Ref<boolean>;
+  
   start: (...args: Parameters<TFn>) => Promise<TaskResult<TFn>>;
   run: (...args: Parameters<TFn>) => Promise<TaskResult<TFn>>;
   stop: () => void;
