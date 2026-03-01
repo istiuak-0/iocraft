@@ -6,8 +6,10 @@ import { AbortRegistry } from "./utils";
 
 export function task<TFn extends AsyncFn>(options: TaskOptions<TFn>) {
   let stopWatch: WatchHandle;
+
   const state = createTaskState<TFn>();
-  createExecution(options, state);
+  const { execute } = createExecution(options, state);
+
 
   if (options.watch) {
     const { deps, immediate } = options.watch;
