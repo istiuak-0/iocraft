@@ -1,6 +1,6 @@
 # Task - User Side Examples
 
-Quick reference for how users will interact with the task system.
+Quick reference for how to use the task system.
 
 ## Basic Usage
 
@@ -21,37 +21,37 @@ const userTask = task({
 
 <template>
   <button @click="userTask.run(1)">Fetch User</button>
-  
-  <div v-if="userTask.isLoading.value">Loading...</div>
-  <div v-else-if="userTask.error.value">{{ userTask.error.value.message }}</div>
-  <div v-else-if="userTask.data.value">
-    <h2>{{ userTask.data.value.name }}</h2>
+
+  <div v-if="userTask.isLoading">Loading...</div>
+  <div v-else-if="userTask.error">{{ userTask.error.message }}</div>
+  <div v-else-if="userTask.data">
+    <h2>{{ userTask.data.name }}</h2>
   </div>
 </template>
 ```
 
-## What Users Get
+## Reactive State & Methods
 
 ```typescript
-const task = task({ fn: myAsyncFn })
+const userTask = task({ fn: myAsyncFn })
 
-// Reactive state
-task.data.value        // T | undefined
-task.error.value       // Error | undefined
-task.status.value      // 'idle' | 'loading' | 'success' | 'error'
-task.isLoading.value   // boolean
-task.isSuccess.value   // boolean
-task.isError.value     // boolean
-task.isIdle.value      // boolean
-task.initialized.value // boolean
+// Reactive state (use .value in setup, direct in templates)
+userTask.data.value        // T | undefined
+userTask.error.value       // Error | undefined
+userTask.status.value      // 'idle' | 'loading' | 'success' | 'error'
+userTask.isLoading         // ComputedRef<boolean>
+userTask.isSuccess         // ComputedRef<boolean>
+userTask.isError           // ComputedRef<boolean>
+userTask.isIdle            // ComputedRef<boolean>
+userTask.initialized.value // boolean
 
 // Methods
-await task.run(...args)     // Execute (with debounce if configured)
-await task.start(...args)   // Execute once (respects lazy)
-task.stop()                 // Cancel current execution
-task.clear()                // Clear data and error
-task.reset()                // Reset to initial state
-task.dispose()              // Clean up all resources
+await userTask.run(...args)     // Execute (with debounce if configured)
+await userTask.start(...args)   // Execute once (respects initialized state)
+userTask.stop()                 // Cancel current execution (requires key)
+userTask.clear()                // Clear data and error
+userTask.reset()                // Reset to initial state
+userTask.dispose()              // Clean up all resources
 ```
 
 ## Examples
@@ -73,16 +73,16 @@ const searchTask = task({
 
 <template>
   <input @input="searchTask.run($event.target.value)" />
-  <div v-if="searchTask.isLoading.value">Searching...</div>
-  <ul v-else-if="searchTask.data.value">
-    <li v-for="item in searchTask.data.value" :key="item.id">
+  <div v-if="searchTask.isLoading">Searching...</div>
+  <ul v-else-if="searchTask.data">
+    <li v-for="item in searchTask.data" :key="item.id">
       {{ item.name }}
     </li>
   </ul>
 </template>
 ```
 
-### Form Submission
+### Form Submission with Retry
 
 ```html
 <script setup lang="ts">
@@ -101,7 +101,7 @@ const loginTask = task({
     if (!response.ok) throw new Error('Login failed')
     return response.json()
   },
-  retry: { count: 2 },
+  retry: { count: 2, delay: 1000, backoff: true },
 })
 
 async function handleSubmit() {
@@ -115,15 +115,15 @@ async function handleSubmit() {
   <form @submit.prevent="handleSubmit">
     <input v-model="form.email" type="email" />
     <input v-model="form.password" type="password" />
-    <button type="submit" :disabled="loginTask.isLoading.value">
-      {{ loginTask.isLoading.value ? 'Logging in...' : 'Login' }}
+    <button type="submit" :disabled="loginTask.isLoading">
+      {{ loginTask.isLoading ? 'Logging in...' : 'Login' }}
     </button>
   </form>
-  <div v-if="loginTask.error.value">{{ loginTask.error.value.message }}</div>
+  <div v-if="loginTask.error">{{ loginTask.error.message }}</div>
 </template>
 ```
 
-### Request Cancellation
+### Request Cancellation with Timeout
 
 ```html
 <script setup lang="ts">
@@ -138,6 +138,7 @@ const fetchTask = task({
     })
     return response.json()
   },
+  timeout: 5000, // Abort after 5 seconds
 })
 </script>
 
@@ -145,22 +146,6 @@ const fetchTask = task({
   <button @click="fetchTask.run(1)">Fetch</button>
   <button @click="fetchTask.stop()">Stop</button>
 </template>
-```
-
-### Retry with Backoff
-
-```typescript
-const apiTask = task({
-  fn: async () => {
-    const response = await fetch('/api/unstable')
-    return response.json()
-  },
-  retry: {
-    count: 3,
-    delay: 1000,
-    backoff: true, // 1s, 2s, 4s
-  },
-})
 ```
 
 ### Polling
@@ -177,23 +162,7 @@ const messagesTask = task({
 })
 ```
 
-### Timeout
-
-```typescript
-const slowTask = task({
-  key: 'slow-op',
-  fn: async () => {
-    const controller = abortable('slow-op')
-    const response = await fetch('/api/slow', {
-      signal: controller.signal,
-    })
-    return response.json()
-  },
-  timeout: 5000, // Abort after 5 seconds
-})
-```
-
-### Auto-Run with Track
+### Auto-Run with Watch
 
 ```html
 <script setup lang="ts">
@@ -207,13 +176,16 @@ const userTask = task({
     const response = await fetch(`/api/users/${id}`)
     return response.json()
   },
-  track: () => [userId.value], // Auto-run when userId changes
+  watch: {
+    deps: () => [userId.value],
+    immediate: true,
+  },
 })
 </script>
 
 <template>
   <button @click="userId++">Next User</button>
-  <div v-if="userTask.data.value">{{ userTask.data.value.name }}</div>
+  <div v-if="userTask.data">{{ userTask.data.name }}</div>
 </template>
 ```
 
@@ -225,7 +197,7 @@ const dataTask = task({
   onLoading: () => console.log('Loading...'),
   onSuccess: (data) => console.log('Success:', data),
   onError: (error) => console.error('Error:', error),
-  onFinally: ({ data, error }) => console.log('Done'),
+  onFinally: ({ data, error }) => console.log('Done', { data, error }),
 })
 ```
 
@@ -259,37 +231,50 @@ async function loadUserWithPosts(userId: number) {
 }
 ```
 
-### Lazy Execution
+### Using start() for One-Time Execution
 
 ```typescript
 const lazyTask = task({
   fn: fetchData,
-  lazy: true, // Won't run until manually started
 })
 
-// Manually start
-lazyTask.run()
+// start() only executes if not initialized
+await lazyTask.start()
+
+// Subsequent start() calls return current state
+await lazyTask.start() // Returns [data, error] immediately
 ```
 
 ## Options Reference
 
 ```typescript
 task({
-  key?: string | number | symbol,  // For cancellation
+  key?: string | number | symbol,  // Required for stop() cancellation
   fn: AsyncFn,                     // Required
-  lazy?: boolean,                  // Don't auto-execute
-  debounce?: number,               // ms
-  timeout?: number,                // ms
+  debounce?: number,               // ms - debounce run() calls
+  timeout?: number,                // ms - abort after timeout
   retry?: {
-    count: number,
-    delay?: number,
-    backoff?: boolean,
+    count: number,    // Number of retries
+    delay?: number,   // Base delay in ms
+    backoff?: boolean, // Exponential backoff
   },
-  initialArgs?: Parameters<TFn>,
-  track?: () => Parameters<TFn>,
+  polling?: {
+    interval: number, // ms - poll after success
+  },
+  watch?: {
+    deps: () => Parameters<TFn>,
+    immediate?: boolean,
+  },
   onLoading?: () => void,
   onSuccess?: (data: T) => void,
   onError?: (error: Error) => void,
   onFinally?: ({ data, error }) => void,
 })
 ```
+
+## Notes
+
+- Use `.value` for refs (`data`, `error`, `status`, `initialized`) in script
+- Templates auto-unwrap refs - use `task.isLoading` not `task.isLoading.value`
+- `run()` always executes; `start()` respects `initialized` state
+- `stop()` and `timeout` require a `key` to work with `abortable()`

@@ -6,7 +6,7 @@ export function createExecution<TFn extends AsyncFn>(options: TaskOptions<TFn>, 
   let poller: ReturnType<typeof createPoller>;
 
   async function execute(...args: Parameters<TFn>): Promise<TaskResult<TFn>> {
-    const executionId = ++state.executionId.value;
+    const currentExecutionId = ++state.executionId.value;
     abortTask(options.key);
 
     let timeout: ReturnType<typeof createTimeout> | undefined;
@@ -30,7 +30,7 @@ export function createExecution<TFn extends AsyncFn>(options: TaskOptions<TFn>, 
 
       const [result, error] = await runTask(() => options.fn(...args), options.retry);
 
-      if (executionId !== state.executionId.value) return [undefined, undefined];
+      if (currentExecutionId !== state.executionId.value) return [undefined, undefined];
 
       if (error) {
         state.status.value = "error";
@@ -52,7 +52,7 @@ export function createExecution<TFn extends AsyncFn>(options: TaskOptions<TFn>, 
       return [result as Awaited<ReturnType<TFn>>, undefined];
     } finally {
       timeout?.clear();
-      if (executionId === state.executionId.value) {
+      if (currentExecutionId === state.executionId.value) {
         options.onFinally?.({ data: state.data.value, error: state.error.value });
       }
     }
