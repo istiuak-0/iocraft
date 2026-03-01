@@ -1,10 +1,12 @@
 import type { createTaskState } from "./state";
-import type { AsyncFn, TaskOptions, TaskResult } from "./types";
+import type { AsyncFn, StopPoller, TaskOptions, TaskResult } from "./types";
 import { abortTask, createPoller, createTimeout, runTask } from "./utils";
 
-export function createExecution<TFn extends AsyncFn>(options: TaskOptions<TFn>, state: ReturnType<typeof createTaskState<TFn>>) {
-  let poller: ReturnType<typeof createPoller>;
-
+export function createExecution<TFn extends AsyncFn>(
+  options: TaskOptions<TFn>,
+  state: ReturnType<typeof createTaskState<TFn>>,
+  pollerRef: { current: StopPoller | undefined } 
+) {
   async function execute(...args: Parameters<TFn>): Promise<TaskResult<TFn>> {
     const currentExecutionId = ++state.executionId.value;
     abortTask(options.key);
@@ -43,8 +45,8 @@ export function createExecution<TFn extends AsyncFn>(options: TaskOptions<TFn>, 
       state.data.value = result as Awaited<ReturnType<TFn>>;
       options.onSuccess?.(result as Awaited<ReturnType<TFn>>);
 
-      if (options.polling && !poller) {
-        poller = createPoller(() => {
+      if (options.polling && !pollerRef.current) {
+        pollerRef.current = createPoller(() => {
           if (state.status.value !== "loading") execute(...args);
         }, options.polling.interval);
       }

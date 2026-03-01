@@ -15,6 +15,10 @@ export interface PollingConfig {
   interval: number;
 }
 
+export interface StopPoller {
+  stop: () => void;
+}
+
 export interface TaskOptions<TFn extends AsyncFn> {
   key?: Primitives;
   fn: TFn;
@@ -26,7 +30,7 @@ export interface TaskOptions<TFn extends AsyncFn> {
     deps: () => Parameters<TFn>;
     immediate?: boolean;
   };
-  
+
   onLoading?: () => void;
   onSuccess?: (data: Awaited<ReturnType<TFn>>) => void;
   onError?: (error: Error) => void;
