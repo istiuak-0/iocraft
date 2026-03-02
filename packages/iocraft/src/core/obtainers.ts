@@ -1,8 +1,8 @@
-import { getCurrentInstance, inject, provide } from 'vue';
-import { createFacadeObj } from './facade';
-import { bindLifecycleHooks, creationStack, RootRegistry } from './internals';
-import type { ServiceConstructor } from './types';
-import { getServiceMetadata } from './utils';
+import { getCurrentInstance, inject, provide } from "vue";
+import { createFacadeObj } from "./facade";
+import { bindLifecycleHooks, creationStack, RootRegistry } from "./internals";
+import type { ServiceConstructor } from "./types";
+import { getServiceMetadata } from "./utils";
 
 /**
  * obtain Facade of a global singleton service From Root Registry
@@ -73,7 +73,7 @@ export function obtainRaw<T extends ServiceConstructor>(serviceClass: T) {
  * @param {T} serviceClass
  * @returns {InstanceType<T>}
  */
-export function obtainInstance<T extends ServiceConstructor>(serviceClass: T) {
+export function obtainNew<T extends ServiceConstructor>(serviceClass: T) {
   const serviceMeta = getServiceMetadata(serviceClass);
 
   if (creationStack.has(serviceMeta.token)) {
@@ -96,10 +96,6 @@ export function obtainInstance<T extends ServiceConstructor>(serviceClass: T) {
   }
 }
 
-
-
-
-
 /**
  * obtain a new Service Instance
  *
@@ -108,7 +104,7 @@ export function obtainInstance<T extends ServiceConstructor>(serviceClass: T) {
  * @param {T} serviceClass
  * @returns {InstanceType<T>}
  */
-export function obtainRawInstance<T extends ServiceConstructor>(serviceClass: T) {
+export function obtainNewRaw<T extends ServiceConstructor>(serviceClass: T) {
   const serviceMeta = getServiceMetadata(serviceClass);
 
   if (creationStack.has(serviceMeta.token)) {
@@ -130,8 +126,6 @@ export function obtainRawInstance<T extends ServiceConstructor>(serviceClass: T)
   }
 }
 
-
-
 /**
  * Expose a service to context
  *
@@ -139,7 +133,7 @@ export function obtainRawInstance<T extends ServiceConstructor>(serviceClass: T)
  * @template {ServiceConstructor} T
  * @param {InstanceType<T>} serviceInstance
  */
-export function exposeToContext<T extends ServiceConstructor>(serviceInstance: InstanceType<T>) {
+export function exposeCtx<T extends ServiceConstructor>(serviceInstance: InstanceType<T>) {
   const serviceMeta = getServiceMetadata(serviceInstance);
   provide(serviceMeta.token, serviceInstance);
 }
@@ -152,7 +146,7 @@ export function exposeToContext<T extends ServiceConstructor>(serviceInstance: I
  * @param {T} serviceClass
  * @returns {*}
  */
-export function obtainFromContext<T extends ServiceConstructor>(serviceClass: T) {
+export function obtainCtx<T extends ServiceConstructor>(serviceClass: T) {
   const serviceMeta = getServiceMetadata(serviceClass);
   return inject<InstanceType<T>>(serviceMeta.token);
 }

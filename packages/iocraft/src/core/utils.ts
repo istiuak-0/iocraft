@@ -39,7 +39,8 @@ export function hasService(serviceClass: ServiceConstructor) {
  * @param {ServiceConstructor} serviceClass 
  * @returns {*} 
  */
-export function unRegister<T extends InstanceType<ServiceConstructor>>(serviceInstance: T) {
+
+export function detach<T extends InstanceType<ServiceConstructor>>(serviceInstance: T) {
   const meta = getServiceMetadata(serviceInstance);
   const exist = RootRegistry.has(meta.token);
   if (!exist) return false;

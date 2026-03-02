@@ -1,7 +1,7 @@
-export * from './core/facade';
-export * from './core/obtainers';
-export * from './core/plugin';
-export * from './core/register';
+export { obtain, obtainRaw, obtainNew, obtainNewRaw, exposeCtx, obtainCtx } from "./core/obtainers";
+export { iocraft } from "./core/plugin";
+export { attach } from "./core/attach";
+
 export type {
   OnMounted,
   OnUpdated,
@@ -16,5 +16,8 @@ export type {
   OnDeactivated,
   OnServerPrefetch,
   OnScopeDispose,
-} from './core/types';
-export * from './core/utils';
+} from "./core/types";
+export {
+  hasService,
+  
+} from "./core/utils";
