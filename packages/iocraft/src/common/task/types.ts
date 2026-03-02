@@ -15,8 +15,16 @@ export interface PollingConfig {
   interval: number;
 }
 
-export interface StopPoller {
-  stop: () => void;
+export type Optional<T> = T | undefined;
+
+export interface PollerRef {
+  current: Optional<{
+    stop: () => void;
+  }>;
+}
+
+export interface ClearTimeOut {
+  clear: () => void;
 }
 
 export interface TaskOptions<TFn extends AsyncFn> {
@@ -37,7 +45,7 @@ export interface TaskOptions<TFn extends AsyncFn> {
   onFinally?: (result: { data?: Awaited<ReturnType<TFn>>; error?: Error }) => void;
 }
 
-export interface TaskReturn<TFn extends AsyncFn> {
+export interface TaskState<TFn extends AsyncFn> {
   data: Ref<Awaited<ReturnType<TFn>> | undefined>;
   error: Ref<Error | undefined>;
   status: Ref<TaskStatus>;
@@ -46,7 +54,10 @@ export interface TaskReturn<TFn extends AsyncFn> {
   isSuccess: ComputedRef<boolean>;
   isError: ComputedRef<boolean>;
   initialized: Ref<boolean>;
+  executionId: Ref<number>;
+}
 
+export interface TaskReturn<TFn extends AsyncFn> extends TaskState<TFn> {
   start: (...args: Parameters<TFn>) => Promise<TaskResult<TFn>>;
   run: (...args: Parameters<TFn>) => Promise<TaskResult<TFn>>;
   stop: () => void;

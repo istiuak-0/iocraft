@@ -1,18 +1,27 @@
 import { watch, type WatchHandle } from "vue";
-import { createExecution } from "./execution";
-import { createTaskState } from "./state";
-import type { AsyncFn, Primitives, StopPoller, TaskOptions, TaskResult, TaskReturn } from "./types";
-import { AbortRegistry, abortTask, createDebounce } from "./utils";
+import type { AsyncFn, Optional, PollerRef, Primitives, TaskOptions, TaskResult, TaskReturn } from "./types";
+import { AbortRegistry, abortTask, createDebounce, createExecution, createTaskState } from "./utils";
 
+/**
+ *
+ * An Async Resource Wrapper That Gives
+ * Common Application States
+ * Out Of The Box With Full Reactivity
+ *
+ * @param {TaskOptions<TFn>} options
+ * @returns {TaskReturn<TFn>}
+ */
 export function task<TFn extends AsyncFn>(options: TaskOptions<TFn>): TaskReturn<TFn> {
   const state = createTaskState<TFn>();
 
-  const pollerRef = { current: undefined as StopPoller | undefined };
+  const pollerRef: PollerRef = { current: undefined };
+
   const { execute } = createExecution(options, state, pollerRef);
-  
+
   const debounce = createDebounce();
 
-  let stopWatch: WatchHandle | undefined;
+  let stopWatch: Optional<WatchHandle>;
+
   if (options.watch) {
     const { deps, immediate } = options.watch;
     stopWatch = watch(deps, (newArgs) => execute(...newArgs), { immediate });
@@ -32,7 +41,7 @@ export function task<TFn extends AsyncFn>(options: TaskOptions<TFn>): TaskReturn
     },
 
     stop(): void {
-      if (!options.key) {
+      if (!options.key && __DEV__) {
         console.warn("[IOCRAFT::TASK] ⟶ stop() requires a key and abortable()");
         return;
       }
@@ -70,7 +79,7 @@ export function task<TFn extends AsyncFn>(options: TaskOptions<TFn>): TaskReturn
 }
 
 export function abortable(key: Primitives): AbortController {
-  if (AbortRegistry.has(key)) {
+  if (AbortRegistry.has(key) && __DEV__) {
     console.error("[IOCRAFT::TASK] ⟶ This Key Is Aredy Presenbt In registry");
   }
   const controller = new AbortController();

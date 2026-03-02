@@ -1,8 +1,46 @@
-import type { AsyncFn, Primitives, RetryConfig, TaskResult } from "./types";
+import { computed, ref } from "vue";
+import type {
+  AsyncFn,
+  ClearTimeOut,
+  Optional,
+  PollerRef,
+  Primitives,
+  RetryConfig,
+  TaskOptions,
+  TaskResult,
+  TaskState,
+  TaskStatus,
+} from "./types";
 
 export const AbortRegistry = new Map<Primitives, AbortController>();
 
-export function abortTask(key?: Primitives) {
+export function createTaskState<TFn extends AsyncFn>(): TaskState<TFn> {
+  const data = ref<Optional<Awaited<ReturnType<TFn>>>>();
+  const error = ref<Optional<Error>>();
+  const status = ref<TaskStatus>("idle");
+
+  const initialized = ref(false);
+  const executionId = ref(0);
+
+  const isLoading = computed(() => status.value === "loading");
+  const isIdle = computed(() => status.value === "idle");
+  const isError = computed(() => status.value === "error");
+  const isSuccess = computed(() => status.value === "success");
+
+  return {
+    data,
+    error,
+    status,
+    initialized,
+    isLoading,
+    isIdle,
+    isError,
+    isSuccess,
+    executionId,
+  };
+}
+
+export function abortTask(key: Optional<Primitives>) {
   if (key) AbortRegistry.get(key)?.abort();
 }
 
@@ -20,12 +58,8 @@ function getRetryDelay(config: RetryConfig, attempt: number): number | null {
     : config.delay; // flat: 100ms, 100ms, 100ms...
 }
 
-
-export async function runTask<TFn extends AsyncFn>(
-  fn: () => ReturnType<TFn>,
-  config?: RetryConfig,
-): Promise<TaskResult<TFn>> {
-  // No retry config: execute once without retry logic
+export async function runTask<TFn extends AsyncFn>(fn: () => ReturnType<TFn>, config: Optional<RetryConfig>): Promise<TaskResult<TFn>> {
+  /// No retry config Provided : Execute without retry
   if (!config) {
     try {
       const result = await fn();
@@ -42,7 +76,6 @@ export async function runTask<TFn extends AsyncFn>(
   let lastError: Error | undefined;
 
   for (let attempt = 0; attempt < totalAttemptsAllowed; attempt++) {
-
     if (attempt > 0) {
       const delay = getRetryDelay(config, attempt);
       if (delay) await new Promise((resolve) => setTimeout(resolve, delay));
@@ -60,7 +93,74 @@ export async function runTask<TFn extends AsyncFn>(
   return [undefined, lastError];
 }
 
+export function createPoller(fn: () => void, ms: number) {
+  const handle = setInterval(fn, ms);
+  return {
+    stop: () => clearInterval(handle),
+  };
+}
 
+export function createExecution<TFn extends AsyncFn>(options: TaskOptions<TFn>, state: TaskState<TFn>, pollerRef: PollerRef) {
+  async function execute(...args: Parameters<TFn>): Promise<TaskResult<TFn>> {
+    const currentExecutionId = ++state.executionId.value;
+    abortTask(options.key);
+
+    let timeout: Optional<ClearTimeOut>;
+
+    /// Handle Timeout abort the request and update reactive states after timeout
+    if (options.timeout) {
+      timeout = createTimeout(() => {
+        if (!options.key && __DEV__) {
+          console.warn(
+            "[IOCRAFT::TASK] ⟶ timeout triggered but request won't be cancelled — add a `key` and use `abortable(key)` to enable proper cancellation",
+          );
+        }
+
+        abortTask(options.key);
+
+        state.executionId.value++;
+        state.status.value = "idle";
+        state.error.value = undefined;
+      }, options.timeout);
+    }
+
+    try {
+      state.status.value = "loading";
+      state.error.value = undefined;
+      options.onLoading?.();
+
+      const [result, error] = await runTask(() => options.fn(...args), options.retry);
+
+      if (currentExecutionId !== state.executionId.value) return [undefined, undefined];
+
+      if (error) {
+        state.status.value = "error";
+        state.error.value = error;
+        options.onError?.(error);
+        return [undefined, error];
+      }
+
+      state.status.value = "success";
+      state.data.value = result as Awaited<ReturnType<TFn>>;
+      options.onSuccess?.(result as Awaited<ReturnType<TFn>>);
+
+      if (options.polling && !pollerRef.current) {
+        pollerRef.current = createPoller(() => {
+          if (state.status.value !== "loading") execute(...args);
+        }, options.polling.interval);
+      }
+
+      return [result as Awaited<ReturnType<TFn>>, undefined];
+    } finally {
+      timeout?.clear();
+      if (currentExecutionId === state.executionId.value) {
+        options.onFinally?.({ data: state.data.value, error: state.error.value });
+      }
+    }
+  }
+
+  return { execute };
+}
 
 export function createDebounce() {
   let handle: ReturnType<typeof setTimeout> | undefined;
@@ -72,15 +172,6 @@ export function createDebounce() {
     });
   };
 }
-
-export function createPoller(fn: () => void, ms: number) {
-  const handle = setInterval(fn, ms);
-  return {
-    stop: () => clearInterval(handle),
-  };
-}
-
-
 
 export function releaseKey(key?: Primitives) {
   if (key == null) return;
