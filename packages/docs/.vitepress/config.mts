@@ -4,6 +4,7 @@ import baseConfig from "vitepress-carbon/config";
 
 export default defineConfigWithTheme<ThemeConfig>({
   extends: baseConfig,
+  base: "/iocraft/",
   title: "iocraft",
   description: "A lightweight dependency injection container for Vue 3",
   srcDir: "src",
