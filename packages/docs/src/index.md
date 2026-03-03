@@ -4,11 +4,7 @@ layout: home
 hero:
   name: "iocraft"
   text: "Dependency Injection for Vue 3"
-  tagline: A lightweight IOC container leveraging the Composition API
-  # icon: 🛠️
-  image:
-    src: ./bg.svg
-    alt: Banner
+  tagline: A lightweight IOC container for Vue 3 with reactive services and async task management
   actions:
     - theme: brand
       text: Get Started
@@ -19,10 +15,11 @@ hero:
 
 features:
   - title: Simple DI
-    details: Easy service registration and injection with decorators
-  - title: Vue Integration
-    details: Seamless integration with Vue 3 Composition API and lifecycle hooks
+    details: Register services with @attach() decorator and inject anywhere
   - title: Reactive by Default
-    details: Preserves Vue's reactivity system when destructuring services
+    details: Preserves Vue reactivity when destructuring services
+  - title: Task System
+    details: Handle async with loading states, retry, and debounce
+  - title: Lifecycle Hooks
+    details: Use Vue lifecycle hooks in services with obtainNew()
 ---
-

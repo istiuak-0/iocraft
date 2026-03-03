@@ -8,11 +8,15 @@ export default defineConfigWithTheme<ThemeConfig>({
   description: "A lightweight dependency injection container for Vue 3",
   srcDir: 'src',
   appearance: 'dark',
+  logo: {
+    src: '/logo.svg',
+    alt: 'iocraft',
+  },
   themeConfig: {
     nav: [
       { text: 'Home', link: '/' },
       { text: 'Guide', link: '/introduction/getting-started' },
-      { text: 'API', link: '/api/register-decorator' },
+      { text: 'API', link: '/api/attach' },
     ],
 
     search: {
@@ -38,19 +42,12 @@ export default defineConfigWithTheme<ThemeConfig>({
         ]
       },
       {
-        text: 'Advanced Features',
-        items: [
-          { text: 'Plugin System', link: '/advanced/plugin-system' },
-          { text: 'Router Integration', link: '/advanced/router-integration' },
-          { text: 'Circular Dependencies', link: '/advanced/circular-dependencies' },
-          { text: 'Component Context', link: '/advanced/component-context' }
-        ]
-      },
-      {
         text: 'API Reference',
         items: [
-          { text: '@Register Decorator', link: '/api/register-decorator' },
+          { text: 'attach', link: '/api/attach' },
           { text: 'obtain Methods', link: '/api/obtain-methods' },
+          { text: 'Task', link: '/api/task' },
+          { text: 'abortable', link: '/api/abortable' },
           { text: 'Helper Services', link: '/api/helper-services' },
           { text: 'Utility Functions', link: '/api/utility-functions' }
         ]

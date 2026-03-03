@@ -1,6 +1,6 @@
 import { reactive, computed, watch, watchEffect, type ComputedRef, type WatchStopHandle, toRaw } from "vue";
 
-export function Store<T extends Record<string, any>>(initialState: T) {
+export function store<T extends Record<string, any>>(initialState: T) {
   const state = reactive(initialState) as T;
   const initial = initialState;
 
@@ -16,30 +16,19 @@ export function Store<T extends Record<string, any>>(initialState: T) {
     }
 
     pick<K extends keyof T>(key: K): T[K] {
-      return state[key]
+      return state[key];
     }
 
     compute<R>(fn: (state: T) => R): ComputedRef<R> {
       return computed(() => fn(state));
     }
 
-    observe<K extends keyof T>(
-      source: K,
-      callback: (newValue: T[K], oldValue: T[K]) => void
-    ): WatchStopHandle;
+    observe<K extends keyof T>(source: K, callback: (newValue: T[K], oldValue: T[K]) => void): WatchStopHandle;
 
-    observe<R>(
-      source: (state: T) => R,
-      callback: (newValue: R, oldValue: R) => void
-    ): WatchStopHandle;
+    observe<R>(source: (state: T) => R, callback: (newValue: R, oldValue: R) => void): WatchStopHandle;
 
-    observe<K extends keyof T, R>(
-      source: K | ((state: T) => R),
-      callback: (newValue: any, oldValue: any) => void
-    ): WatchStopHandle {
-      const getter = typeof source === 'function'
-        ? () => source(state)
-        : () => state[source as K];
+    observe<K extends keyof T, R>(source: K | ((state: T) => R), callback: (newValue: any, oldValue: any) => void): WatchStopHandle {
+      const getter = typeof source === "function" ? () => source(state) : () => state[source as K];
 
       return watch(getter, callback);
     }
@@ -53,4 +42,3 @@ export function Store<T extends Record<string, any>>(initialState: T) {
     }
   };
 }
-

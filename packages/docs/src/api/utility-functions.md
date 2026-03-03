@@ -1,75 +1,96 @@
 # Utility Functions
 
-iocraft provides several utility functions for advanced use cases.
+Helper functions for managing services.
 
-## `obtainFromContext(ServiceClass)`
+## Service Management
 
-Gets a service from the current component context:
+### `hasService(ServiceClass)`
 
-```javascript
-import { obtainFromContext } from 'iocraft';
-import { MyService } from './services/MyService';
+Check if a service is registered:
 
-const service = obtainFromContext(MyService);
-```
+```typescript
+import { attach, hasService } from 'iocraft';
 
-## `exposeToContext(serviceInstance)`
-
-Shares a service with child components:
-
-```javascript
-import { obtain, exposeToContext } from 'iocraft';
-
-const service = obtain(MyService);
-exposeToContext(service);
-```
-
-## `hasService(ServiceClass)`
-
-Checks if a service exists in the container:
-
-```javascript
-import { hasService } from 'iocraft';
+@attach()
+class MyService {}
 
 if (hasService(MyService)) {
   // Service is registered
 }
 ```
 
-## `unRegister(serviceInstance)`
+### `unRegister(serviceInstance)`
 
-Removes a service from the container:
-
-```javascript
-import { unRegister } from 'iocraft';
-
-unRegister(serviceInstance);
-```
-
-## `clearRegistry()`
-
-Removes all services from the container:
-
-```javascript
-import { clearRegistry } from 'iocraft';
-
-clearRegistry(); // Removes all registered services
-```
-
-## `OnUnRegister` Interface
-
-Implement cleanup when a service is unregistered:
+Remove a service instance:
 
 ```typescript
-import { Register, OnUnRegister } from 'iocraft';
+import { attach, obtain, unRegister } from 'iocraft';
 
-@Register()
-export class ResourceService implements OnUnRegister {
-  resources = [];
+@attach()
+class MyService {}
 
-  onUnRegister() {
-    // Cleanup resources when service is removed
-    this.resources.forEach(resource => resource.destroy());
-  }
-}
+const service = obtain(MyService);
+unRegister(service);
 ```
+
+### `clearRegistry()`
+
+Remove all services:
+
+```typescript
+import { clearRegistry } from 'iocraft';
+
+clearRegistry();
+```
+
+## Context Functions
+
+### `exposeCtx(serviceInstance)`
+
+Expose a service to child components:
+
+```vue
+<script setup>
+import { attach, obtain, exposeCtx } from 'iocraft';
+
+@attach()
+class MyService {}
+
+const service = obtain(MyService);
+exposeCtx(service);
+</script>
+```
+
+### `obtainCtx(ServiceClass)`
+
+Obtain a service from parent context:
+
+```vue
+<script setup>
+import { attach, obtainCtx } from 'iocraft';
+
+@attach()
+class MyService {}
+
+const service = obtainCtx(MyService);
+</script>
+```
+
+### `getServiceMeta(serviceInstance)`
+
+Get service metadata:
+
+```typescript
+import { attach, obtain, getServiceMeta } from 'iocraft';
+
+@attach()
+class MyService {}
+
+const service = obtain(MyService);
+const meta = getServiceMeta(service);
+```
+
+## Related
+
+- [`@attach()`](./attach)
+- [`obtain` Methods](./obtain-methods)

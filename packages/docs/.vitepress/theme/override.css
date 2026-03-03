@@ -1,11 +1,166 @@
 :root {
-  --vp-c-bg-alt: var(--vp-c-bg);
+  --vp-c-brand: #42b883;
+  --vp-c-brand-light: #5cd6a3;
+  --vp-c-brand-lighter: #8cebc4;
+  --vp-c-brand-dark: #35a972;
+  --vp-c-brand-darker: #2a8a5c;
+  
+  /* Force consistent background colors */
+  --vp-c-bg: #0f0f0f;
+  --vp-c-bg-alt: #0f0f0f;
+  --vp-c-bg-elv: #0f0f0f;
+  --vp-c-bg-soft: #0f0f0f;
 }
 
+/* Global background */
+body {
+  background-color: var(--vp-c-bg) !important;
+}
+
+/* Navbar - make it same color as body */
+.VPNav {
+  background-color: var(--vp-c-bg) !important;
+  border-bottom: 1px solid rgba(66, 184, 131, 0.2);
+}
+
+.VPNavBar {
+  background-color: var(--vp-c-bg) !important;
+}
+
+.VPNavBar .content-body {
+  background-color: var(--vp-c-bg) !important;
+}
+
+.VPNavBar .divider {
+  background-color: rgba(66, 184, 131, 0.2);
+}
+
+/* Logo styling */
+.VPNavBar .logo {
+  color: var(--vp-c-brand);
+}
+
+.VPNavBar .title {
+  color: var(--vp-c-brand);
+  font-weight: 700;
+  font-size: 1.3rem;
+}
+
+/* Links */
+a {
+  color: var(--vp-c-brand);
+}
+
+a:hover {
+  color: var(--vp-c-brand-light);
+}
+
+/* Brand button */
+.VPButton.brand {
+  background-color: var(--vp-c-brand);
+}
+
+.VPButton.brand:hover {
+  background-color: var(--vp-c-brand-light);
+}
+
+/* Hide appearance switcher */
 .VPSwitchAppearance {
   display: none !important;
 }
 
 .VPNavBarAppearance {
   display: none !important;
+}
+
+/* Hero */
+.VPHero {
+  padding: 4rem 0;
+}
+
+.VPHero .name {
+  line-height: 1.2;
+  font-size: 3rem;
+  font-weight: 800;
+  color: var(--vp-c-brand);
+}
+
+.VPHero .text {
+  font-size: 1.5rem;
+  font-weight: 500;
+}
+
+.VPHero .tagline {
+  font-size: 1.1rem;
+  max-width: 700px;
+  line-height: 1.7;
+}
+
+/* Features */
+.VPFeatures .item {
+  border-radius: 8px;
+  background-color: var(--vp-c-bg-alt);
+}
+
+/* Tables */
+table {
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+table th {
+  background: var(--vp-c-bg-alt);
+  font-weight: 600;
+}
+
+/* Sidebar */
+.VPSidebar {
+  background-color: var(--vp-c-bg) !important;
+}
+
+.VPSidebarItem.level-0 > .item > .text {
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  letter-spacing: 0.05em;
+}
+
+/* Active sidebar item */
+.VPSidebarItem.active > .item > .text {
+  color: var(--vp-c-brand);
+}
+
+/* Code blocks */
+.vp-code-line.highlighted {
+  background-color: rgba(66, 184, 131, 0.1);
+}
+
+/* Custom blocks */
+.custom-block.tip {
+  border-color: var(--vp-c-brand);
+  background-color: var(--vp-c-bg-alt);
+}
+
+.custom-block.tip .custom-block-title {
+  color: var(--vp-c-brand);
+}
+
+/* Search */
+.VPLocalSearchBox .search-box .search-input {
+  border-color: var(--vp-c-brand);
+}
+
+/* Main content area */
+.VPDoc {
+  background-color: var(--vp-c-bg) !important;
+}
+
+.VPDoc .content-container {
+  background-color: var(--vp-c-bg) !important;
+}
+
+/* Footer */
+.VPFooter {
+  background-color: var(--vp-c-bg) !important;
+  border-top: 1px solid rgba(66, 184, 131, 0.2);
 }

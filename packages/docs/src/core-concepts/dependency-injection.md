@@ -1,48 +1,119 @@
 # Dependency Injection
 
-iocraft provides several methods to inject dependencies into your components.
+How to inject services into components.
 
-## Four Obtain Methods
+## obtain() - Singleton
 
-There are four primary ways to get services, each with different behavior:
+Get a shared instance with reactivity preserved:
 
-### `obtain(Service)`
+```typescript
+import { attach, obtain } from 'iocraft';
+import { ref } from 'vue';
 
-Get a shared instance (singleton) with reactivity preserved when destructured:
+@attach()
+export class CounterService {
+  count = ref(0);
+  
+  increment() {
+    this.count.value++;
+  }
+}
 
-```javascript
-import { obtain } from 'iocraft';
-import { MyService } from './services/MyService';
-
-const service = obtain(MyService);
-const { property, method } = service; // Reactivity preserved
+const { count, increment } = obtain(CounterService);
 ```
 
-### `obtainRaw(Service)`
+## obtainRaw() - Singleton without Reactivity
 
-Get a shared instance (singleton) without reactivity preservation when destructured:
+```typescript
+import { attach, obtainRaw } from 'iocraft';
 
-```javascript
-const service = obtainRaw(MyService);
-const { property, method } = service; // Reactivity lost
+@attach()
+export class LoggerService {
+  log(message: string) {
+    console.log(message);
+  }
+}
+
+const { log } = obtainRaw(LoggerService);
 ```
 
-### `obtainInstance(Service)`
+## obtainNew() - New Instance
 
-Get a new instance each time with reactivity preserved when destructured:
+Get a new instance with reactivity and lifecycle hooks:
 
-```javascript
-const service = obtainInstance(MyService);
-const { property, method } = service; // Reactivity preserved
+```typescript
+import { attach, obtainNew } from 'iocraft';
+import { ref } from 'vue';
+
+@attach()
+export class FormState {
+  formData = ref({ name: '', email: '' });
+  
+  updateField(key: string, value: string) {
+    this.formData.value[key] = value;
+  }
+}
+
+const form = obtainNew(FormState);
 ```
 
-### `obtainRawInstance(Service)`
+## obtainNewRaw() - New Instance without Reactivity
 
-Get a new instance each time without reactivity preservation when destructured:
+```typescript
+import { attach, obtainNewRaw } from 'iocraft';
 
-```javascript
-const service = obtainRawInstance(MyService);
-const { property, method } = service; // Reactivity lost
+@attach()
+export class UtilityService {
+  formatDate(date: Date) {
+    return date.toLocaleDateString();
+  }
+}
+
+const { formatDate } = obtainNewRaw(UtilityService);
 ```
 
-Choose the appropriate method based on your needs for instance sharing and reactivity.
+## Context Injection
+
+### Expose to Children
+
+```vue
+<script setup>
+import { attach, obtain, exposeCtx } from 'iocraft';
+import { ref } from 'vue';
+
+@attach()
+class DataService {
+  data = ref([]);
+}
+
+const service = obtain(DataService);
+exposeCtx(service);
+</script>
+```
+
+### Obtain from Parent
+
+```vue
+<script setup>
+import { attach, obtainCtx } from 'iocraft';
+
+@attach()
+class DataService {}
+
+const service = obtainCtx(DataService);
+</script>
+```
+
+## Comparison
+
+| Method | Instance | Reactivity | Lifecycle Hooks |
+|--------|----------|------------|-----------------|
+| `obtain()` | Singleton | Yes | No |
+| `obtainRaw()` | Singleton | No | No |
+| `obtainNew()` | New | Yes | Yes |
+| `obtainNewRaw()` | New | No | Yes |
+
+## Related
+
+- [`@attach()`](/api/attach)
+- [`obtain` Methods](/api/obtain-methods)

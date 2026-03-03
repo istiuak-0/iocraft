@@ -1,44 +1,92 @@
 # Reactivity Handling
 
-One of the key features of iocraft is how it handles Vue's reactivity system when services are destructured.
+iocraft preserves Vue's reactivity system.
 
-## The Problem
+## Reactive State in Services
 
-When Vue services are destructured, reactivity is typically lost:
+Use Vue's `ref` and `computed`:
 
-```javascript
-// Without iocraft - reactivity lost
-const { count } = someService;
-// count is no longer reactive
+```typescript
+import { attach } from 'iocraft';
+import { ref, computed } from 'vue';
+
+@attach()
+export class CounterService {
+  count = ref(0);
+  
+  get doubled() {
+    return computed(() => this.count.value * 2);
+  }
+
+  increment() {
+    this.count.value++;
+  }
+}
 ```
 
-## iocraft Solution
+## Destructuring with Reactivity
 
-iocraft provides two approaches to preserve reactivity:
+`obtain()` and `obtainNew()` preserve reactivity when destructuring:
 
-### Using `obtain()` and `obtainInstance()`
-
-These methods return a proxy that preserves reactivity even after destructuring:
-
-```javascript
+```typescript
 import { obtain } from 'iocraft';
-import { CounterService } from './services/CounterService';
 
-// Reactivity preserved after destructuring
-const { count, increment } = obtain(CounterService);
+const { count, doubled, increment } = obtain(CounterService);
+
+// count.value updates trigger UI updates
 ```
 
-### Using `obtainRaw()` and `obtainRawInstance()`
+## In Templates
 
-These methods return the raw service instance without reactivity preservation:
+```vue
+<script setup>
+import { obtain } from 'iocraft';
+import { CounterService } from './CounterService';
 
-```javascript
-// Reactivity lost after destructuring
-const { count, increment } = obtainRaw(CounterService);
+const { count, doubled, increment } = obtain(CounterService);
+</script>
+
+<template>
+  <div>
+    <p>Count: {{ count }}</p>
+    <p>Doubled: {{ doubled }}</p>
+    <button @click="increment">+</button>
+  </div>
+</template>
 ```
 
-## Best Practices
+## Without Reactivity
 
-- Use `obtain()` or `obtainInstance()` when you plan to destructure the service
-- Use `obtainRaw()` or `obtainRawInstance()` when you only need to call methods directly
-- Always use `obtainInstance()` if you need lifecycle hooks to work
+Use `obtainRaw()` or `obtainNewRaw()` when you don't need reactivity:
+
+```typescript
+import { obtainRaw } from 'iocraft';
+
+const { log } = obtainRaw(LoggerService);
+```
+
+## store() Reactivity
+
+The `store()` function provides reactive state management:
+
+```typescript
+import { attach, store } from 'iocraft';
+
+const BaseCounterStore = store({ count: 0 });
+
+@attach()
+export class CounterService extends BaseCounterStore {
+  increment() {
+    this.update({ count: this.state.count + 1 });
+  }
+  
+  get doubled() {
+    return this.compute((s) => s.count * 2);
+  }
+}
+```
+
+## Related
+
+- [`@attach()`](/api/attach)
+- [`store`](/api/helper-services)
