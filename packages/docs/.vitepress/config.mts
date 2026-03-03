@@ -26,7 +26,7 @@ export default defineConfigWithTheme<ThemeConfig>({
         text: "Introduction",
         items: [
           { text: "What is iocraft?", link: "/introduction/what-is-iocraft" },
-          { text: "Installation", link: "/introduction/installation" },
+          // { text: "Installation", link: "/introduction/installation" },
           { text: "Getting Started", link: "/introduction/getting-started" },
         ],
       },

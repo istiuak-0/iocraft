@@ -39,5 +39,4 @@ const { count, increment } = obtain(CounterService);
 
 ## Next Steps
 
-- [Installation](./installation)
 - [Getting Started](./getting-started)
