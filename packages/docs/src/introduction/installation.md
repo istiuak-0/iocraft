@@ -1,34 +1,35 @@
 # Installation
 
-You can install iocraft using your preferred package manager.
-
-## npm
+## Package Managers
 
 ```bash
 npm install iocraft
 ```
 
-## yarn
-
 ```bash
 yarn add iocraft
 ```
-
-## pnpm
 
 ```bash
 pnpm add iocraft
 ```
 
-## Peer Dependencies
+## Requirements
 
-iocraft requires the following peer dependencies:
+- Vue ^3.0.0
+- Node.js >= 18.0.0
 
-- `vue` ^3.0.0
-- `vue-router` ^4.0.0 (optional, only needed for router integration)
+## Optional: Router Integration
 
-Make sure these are installed in your project.
+```bash
+npm install vue-router@^4.0.0
+```
 
-## TypeScript Support
+## TypeScript
 
-iocraft is written in TypeScript and provides full type definitions out of the box.
+TypeScript is supported out of the box.
+
+## Next Steps
+
+- [What is iocraft?](./what-is-iocraft)
+- [Getting Started](./getting-started)

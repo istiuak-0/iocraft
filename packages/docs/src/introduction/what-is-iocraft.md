@@ -1,14 +1,43 @@
 # What is iocraft?
 
-iocraft is a lightweight dependency injection (DI) container for Vue 3 that leverages the Composition API. It provides a simple and intuitive way to manage services and dependencies in Vue applications.
+iocraft is a lightweight dependency injection container for Vue 3.
 
-## Key Features
+## Features
 
-- **Decorator-based service registration** (`@Register()`)
-- **Four service retrieval methods** for different use cases
-- **Vue lifecycle hook integration** for services
-- **Component context sharing** capabilities
-- **Circular dependency handling** via getters
-- **Router integration** through the `Nav` helper service
+- Services with `@attach()` decorator
+- Reactive by default
+- Vue Composition API integration
+- Built-in task system for async operations
 
-iocraft simplifies dependency management in Vue applications while maintaining reactivity and providing clean separation of concerns between business logic and UI components.
+## Basic Usage
+
+```typescript
+import { attach } from 'iocraft';
+import { ref } from 'vue';
+
+@attach()
+export class CounterService {
+  count = ref(0);
+  
+  increment() {
+    this.count.value++;
+  }
+}
+```
+
+```vue
+<script setup>
+import { obtain } from 'iocraft';
+
+const { count, increment } = obtain(CounterService);
+</script>
+
+<template>
+  <button @click="increment">{{ count }}</button>
+</template>
+```
+
+## Next Steps
+
+- [Installation](./installation)
+- [Getting Started](./getting-started)

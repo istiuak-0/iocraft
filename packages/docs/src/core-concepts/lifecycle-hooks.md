@@ -1,14 +1,14 @@
 # Lifecycle Hooks
 
-Services can use Vue lifecycle hooks, making them behave like components in certain contexts.
+Services can use Vue lifecycle hooks with `obtainNew()`.
 
 ## Available Hooks
 
-Services can implement any Vue lifecycle hooks:
+All Vue lifecycle hooks are supported:
 
 - `onMounted`
-- `onUnmounted`
 - `onUpdated`
+- `onUnmounted`
 - `onBeforeMount`
 - `onBeforeUpdate`
 - `onBeforeUnmount`
@@ -20,35 +20,103 @@ Services can implement any Vue lifecycle hooks:
 - `onServerPrefetch`
 - `onScopeDispose`
 
-## Using Lifecycle Hooks
+## Usage
 
 ```typescript
-import { Register } from 'iocraft';
+import { attach } from 'iocraft';
+import { ref } from 'vue';
 
-@Register()
-export class DataService {
-  data = [];
+@attach()
+export class DataService implements OnMounted, OnUnmounted {
+  data = ref([]);
 
-  // This runs when the service is attached to a component
   onMounted() {
-    console.log('DataService mounted to component');
     this.loadData();
   }
 
-  // This runs when the component unmounts
   onUnmounted() {
-    console.log('DataService unmounted from component');
-    // Perform cleanup
+    this.cleanup();
   }
 
-  loadData() {
-    // Load data
+  async loadData() {
+    const res = await fetch('/api/data');
+    this.data.value = await res.json();
+  }
+
+  cleanup() {
+    this.data.value = [];
   }
 }
 ```
 
-## Important Notes
+## When Hooks Run
 
-- Lifecycle hooks only work when using `obtainInstance()` or `obtainRawInstance()` inside a component
-- When using `obtain()` or `obtainRaw()`, lifecycle hooks won't be triggered since these create global singletons
-- These hooks allow services to respond to component lifecycle events
+Lifecycle hooks only run with `obtainNew()` or `obtainNewRaw()`:
+
+```typescript
+// Hooks will run
+const service = obtainNew(DataService);
+
+// Hooks won't run (singleton)
+const singleton = obtain(DataService);
+```
+
+## Example: Polling Service
+
+```typescript
+import { attach } from 'iocraft';
+import { ref } from 'vue';
+
+@attach()
+export class PollingService implements OnMounted, OnUnmounted {
+  data = ref([]);
+  intervalId: number | null = null;
+
+  onMounted() {
+    this.loadData();
+    this.intervalId = setInterval(() => {
+      this.loadData();
+    }, 30000);
+  }
+
+  onUnmounted() {
+    if (this.intervalId) {
+      clearInterval(this.intervalId);
+    }
+  }
+
+  async loadData() {
+    const res = await fetch('/api/data');
+    this.data.value = await res.json();
+  }
+}
+```
+
+## Example: Form with Cleanup
+
+```typescript
+import { attach, obtainNew } from 'iocraft';
+import { ref } from 'vue';
+
+@attach()
+export class FormService implements OnUnmounted {
+  formData = ref({ name: '', email: '' });
+  subscribers: (() => void)[] = [];
+
+  subscribe(fn: () => void) {
+    this.subscribers.push(fn);
+  }
+
+  onUnmounted() {
+    this.subscribers.forEach(unsub => unsub());
+  }
+}
+
+// In component
+const form = obtainNew(FormService);
+```
+
+## Related
+
+- [`@attach()`](/api/attach)
+- [`obtain` Methods](/api/obtain-methods)

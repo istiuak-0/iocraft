@@ -1,80 +1,126 @@
 # Getting Started
 
-This guide will help you get started with iocraft in your Vue 3 application.
-
-## Prerequisites
-
-- Vue 3.x
-- Node.js >= 18.0.0
-- Basic understanding of Vue Composition API
-
 ## Installation
-
-Install iocraft using your preferred package manager:
 
 ```bash
 npm install iocraft
 ```
 
-## Basic Usage
-
-### 1. Create a Service
-
-Create a service class and decorate it with `@Register()`:
+## Create a Service
 
 ```typescript
-import { Register } from 'iocraft';
+import { attach } from 'iocraft';
+import { ref } from 'vue';
 
-@Register()
-export class UserService {
-  users = [
-    { id: 1, name: 'John' },
-    { id: 2, name: 'Jane' }
-  ];
+@attach()
+export class CounterService {
+  count = ref(0);
 
-  getUsers() {
-    return this.users;
+  increment() {
+    this.count.value++;
   }
 
-  addUser(name: string) {
-    const newUser = { id: this.users.length + 1, name };
-    this.users.push(newUser);
-    return newUser;
+  decrement() {
+    this.count.value--;
   }
 }
 ```
 
-### 2. Use in Components
-
-Get your service in any component:
+## Use in Components
 
 ```vue
 <script setup>
-import { onMounted } from 'vue';
 import { obtain } from 'iocraft';
-import { UserService } from './services/UserService';
+import { CounterService } from './CounterService';
 
-// Get the service instance
-const userService = obtain(UserService);
-
-// Destructure with reactivity preserved
-const { users, addUser } = userService;
-
-onMounted(() => {
-  console.log(users); // Works!
-});
+const { count, increment, decrement } = obtain(CounterService);
 </script>
 
 <template>
   <div>
-    <ul>
-      <li v-for="user in users" :key="user.id">
-        {{ user.name }}
-      </li>
-    </ul>
-    <button @click="addUser('New User')">Add User</button>
+    <h2>Count: {{ count }}</h2>
+    <button @click="increment">+</button>
+    <button @click="decrement">-</button>
   </div>
 </template>
 ```
 
-That's it! You now have a working service that can be injected into any component.
+## Async with task()
+
+```typescript
+import { attach, task } from 'iocraft';
+
+@attach()
+export class PostService {
+  readonly fetchPosts = task({
+    fn: async () => {
+      const res = await fetch('/api/posts');
+      return res.json();
+    },
+    retry: { count: 2 },
+  });
+}
+```
+
+```vue
+<script setup>
+import { obtain } from 'iocraft';
+import { PostService } from './PostService';
+
+const postService = obtain(PostService);
+postService.fetchPosts.run();
+</script>
+
+<template>
+  <div>
+    <div v-if="postService.fetchPosts.isLoading">Loading...</div>
+    <div v-else-if="postService.fetchPosts.error">
+      Error: {{ postService.fetchPosts.error.message }}
+    </div>
+    <ul v-else-if="postService.fetchPosts.data">
+      <li v-for="post in postService.fetchPosts.data" :key="post.id">
+        {{ post.title }}
+      </li>
+    </ul>
+  </div>
+</template>
+```
+
+## Service Dependencies
+
+```typescript
+import { attach, obtain } from 'iocraft';
+import { ref } from 'vue';
+
+@attach()
+export class AuthService {
+  user = ref(null);
+
+  login(username: string, password: string) {
+    this.user.value = { username };
+  }
+}
+
+@attach()
+export class PostService {
+  private get authService() {
+    return obtain(AuthService);
+  }
+
+  readonly fetchPosts = task({
+    fn: async () => {
+      if (!this.authService.user.value) {
+        throw new Error('Not authenticated');
+      }
+      const res = await fetch('/api/posts');
+      return res.json();
+    },
+  });
+}
+```
+
+## Next Steps
+
+- [Service Registration](/core-concepts/service-registration)
+- [Dependency Injection](/core-concepts/dependency-injection)
+- [Task System](/api/task)

@@ -1,55 +1,143 @@
 # obtain Methods
 
-iocraft provides four methods to obtain services, each with different behaviors regarding instance sharing and reactivity.
+Functions to obtain service instances.
+
+## Overview
+
+| Method | Instance | Reactivity | Lifecycle Hooks |
+|--------|----------|------------|-----------------|
+| `obtain()` | Singleton | Yes | No |
+| `obtainRaw()` | Singleton | No | No |
+| `obtainNew()` | New each time | Yes | Yes |
+| `obtainNewRaw()` | New each time | No | Yes |
 
 ## `obtain(ServiceClass)`
 
-Gets a shared instance (singleton) with reactivity preserved when destructured:
+Get a shared singleton instance with reactivity preserved:
 
-```javascript
-import { obtain } from 'iocraft';
-import { MyService } from './services/MyService';
+```typescript
+import { attach, obtain } from 'iocraft';
+import { ref } from 'vue';
 
-const service = obtain(MyService);
-const { property, method } = service; // Reactivity preserved
+@attach()
+export class CounterService {
+  count = ref(0);
+
+  increment() {
+    this.count.value++;
+  }
+}
+
+const counter = obtain(CounterService);
+const { count, increment } = counter;
 ```
 
 ## `obtainRaw(ServiceClass)`
 
-Gets a shared instance (singleton) without reactivity preservation when destructured:
+Get a shared singleton instance without reactivity:
 
-```javascript
-import { obtainRaw } from 'iocraft';
+```typescript
+import { attach, obtainRaw } from 'iocraft';
 
-const service = obtainRaw(MyService);
-const { property, method } = service; // Reactivity lost
+@attach()
+export class LoggerService {
+  log(message: string) {
+    console.log(message);
+  }
+}
+
+const logger = obtainRaw(LoggerService);
 ```
 
-## `obtainInstance(ServiceClass)`
+## `obtainNew(ServiceClass)`
 
-Gets a new instance each time with reactivity preserved when destructured:
+Get a new instance each time with reactivity and lifecycle hooks:
 
-```javascript
-import { obtainInstance } from 'iocraft';
+```typescript
+import { attach, obtainNew } from 'iocraft';
+import { ref } from 'vue';
 
-const service = obtainInstance(MyService);
-const { property, method } = service; // Reactivity preserved
+@attach()
+export class FormState {
+  formData = ref({ name: '', email: '' });
+
+  updateField(key: string, value: string) {
+    this.formData.value[key] = value;
+  }
+}
+
+const form1 = obtainNew(FormState);
+const form2 = obtainNew(FormState);
 ```
 
-## `obtainRawInstance(ServiceClass)`
+## `obtainNewRaw(ServiceClass)`
 
-Gets a new instance each time without reactivity preservation when destructured:
+Get a new instance without reactivity:
 
-```javascript
-import { obtainRawInstance } from 'iocraft';
+```typescript
+import { attach, obtainNewRaw } from 'iocraft';
 
-const service = obtainRawInstance(MyService);
-const { property, method } = service; // Reactivity lost
+@attach()
+export class UtilityService {
+  formatDate(date: Date) {
+    return date.toLocaleDateString();
+  }
+}
+
+const utility = obtainNewRaw(UtilityService);
 ```
 
-## When to Use Each Method
+## Lifecycle Hooks
 
-- Use `obtain()` for services that should be shared globally
-- Use `obtainRaw()` when you don't need reactivity after destructuring
-- Use `obtainInstance()` when you need a fresh instance per component
-- Use `obtainRawInstance()` when you need a fresh instance without reactivity
+Lifecycle hooks only work with `obtainNew()` and `obtainNewRaw()`:
+
+```typescript
+import { attach, obtainNew } from 'iocraft';
+import { ref } from 'vue';
+
+@attach()
+class DataService implements OnMounted, OnUnmounted {
+  data = ref([]);
+
+  onMounted() {
+    this.loadData();
+  }
+
+  onUnmounted() {
+    this.cleanup();
+  }
+
+  async loadData() {
+    const res = await fetch('/api/data');
+    this.data.value = await res.json();
+  }
+
+  cleanup() {
+    this.data.value = [];
+  }
+}
+
+// Hooks will run
+const service = obtainNew(DataService);
+```
+
+## In Components
+
+```vue
+<script setup>
+import { obtain, obtainNew } from 'iocraft';
+import { CounterService } from './CounterService';
+import { FormState } from './FormState';
+
+// Singleton - shared across components
+const { count, increment } = obtain(CounterService);
+
+// New instance - unique to this component
+const { formData, updateField } = obtainNew(FormState);
+</script>
+```
+
+## Related
+
+- [`@attach()`](./attach)
+- [Service Registration](/core-concepts/service-registration)
