@@ -13,8 +13,8 @@ npm install iocraft
 ### Create a Service
 
 ```typescript
-import { attach } from 'iocraft';
-import { ref } from 'vue';
+import { attach } from "iocraft";
+import { ref } from "vue";
 
 @attach()
 export class CounterService {
@@ -30,7 +30,7 @@ export class CounterService {
 
 ```vue
 <script setup>
-import { obtain } from 'iocraft';
+import { obtain } from "iocraft";
 
 const { count, increment } = obtain(CounterService);
 </script>
@@ -39,30 +39,6 @@ const { count, increment } = obtain(CounterService);
   <button @click="increment">{{ count }}</button>
 </template>
 ```
-
-### Async with task()
-
-```typescript
-import { attach, task, abortable } from 'iocraft';
-
-@attach()
-export class SearchService {
-  readonly search = task({
-    key: 'search',
-    fn: async (query: string) => {
-      const controller = abortable('search');
-      const res = await fetch(`/api/search?q=${query}`, { signal: controller.signal });
-      return res.json();
-    },
-    debounce: 300,
-    retry: { count: 2 },
-  });
-}
-```
-
-## Documentation
-
-[View Full Documentation](https://iocraft.netlify.app)
 
 ## License
 
