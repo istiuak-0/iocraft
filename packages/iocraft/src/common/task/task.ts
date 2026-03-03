@@ -1,6 +1,6 @@
 import { watch, type WatchHandle } from "vue";
-import type { AsyncFn, Optional, PollerRef, Primitives, TaskOptions, TaskResult, TaskReturn } from "./types";
-import { AbortRegistry, abortTask, createDebounce, createExecution, createTaskState } from "./utils";
+import type { AsyncFn, Optional, Primitives, TaskOptions, TaskResult, TaskReturn, TaskTracker } from "./types";
+import { AbortRegistry, abortTask, createDebounce, createExecution, createTaskState, keyRegistry, releaseKey } from "./utils";
 
 /**
  *
@@ -12,24 +12,38 @@ import { AbortRegistry, abortTask, createDebounce, createExecution, createTaskSt
  * @returns {TaskReturn<TFn>}
  */
 export function task<TFn extends AsyncFn>(options: TaskOptions<TFn>): TaskReturn<TFn> {
+  if (options.key) {
+    if (keyRegistry.has(options.key)) {
+      throw new Error(`[IOCRAFT::TASK] duplicate key '${String(options.key)}'`);
+    }
+    keyRegistry.add(options.key);
+  }
+
   const state = createTaskState<TFn>();
-
-  const pollerRef: PollerRef = { current: undefined };
-
-  const { execute } = createExecution(options, state, pollerRef);
-
+  const { execute } = createExecution(options, state);
   const debounce = createDebounce();
 
   let stopWatch: Optional<WatchHandle>;
+  let tracker: Optional<TaskTracker>;
 
-  if (options.watch) {
-    const { deps, immediate } = options.watch;
+  if (options.track) {
+    const { deps, immediate } = options.track;
     stopWatch = watch(deps, (newArgs) => execute(...newArgs), { immediate });
+    tracker = {
+      pause: () => stopWatch!.pause(),
+      resume: () => stopWatch!.resume(),
+    };
   }
 
   return {
-    ...state,
-
+    data: state.data,
+    error: state.error,
+    status: state.status,
+    isLoading: state.isLoading,
+    isIdle: state.isIdle,
+    isError: state.isError,
+    isSuccess: state.isSuccess,
+    tracker,
     run(...args: Parameters<TFn>): Promise<TaskResult<TFn>> {
       return options.debounce ? debounce(() => execute(...args), options.debounce) : execute(...args);
     },
@@ -41,25 +55,20 @@ export function task<TFn extends AsyncFn>(options: TaskOptions<TFn>): TaskReturn
     },
 
     stop(): void {
-      if (!options.key && __DEV__) {
+      if (!options.key) {
         console.warn("[IOCRAFT::TASK] ⟶ stop() requires a key and abortable()");
         return;
       }
       abortTask(options.key);
+      AbortRegistry.delete(options.key);
       state.executionId.value++;
       state.status.value = "idle";
       state.error.value = undefined;
-    },
-
-    clear(): void {
-      state.executionId.value++;
-      state.data.value = undefined;
-      state.error.value = undefined;
-      state.status.value = "idle";
     },
 
     reset(): void {
       state.executionId.value++;
+      abortTask(options.key);
       state.status.value = "idle";
       state.data.value = undefined;
       state.error.value = undefined;
@@ -68,20 +77,24 @@ export function task<TFn extends AsyncFn>(options: TaskOptions<TFn>): TaskReturn
 
     dispose(): void {
       state.executionId.value++;
-      stopWatch?.();
-      pollerRef.current?.stop(); // accessible via ref object
-      pollerRef.current = undefined;
-      abortTask(options.key);
+      stopWatch?.stop();
+      releaseKey(options.key);
+      if (options.key) keyRegistry.delete(options.key);
       state.status.value = "idle";
+      state.data.value = undefined;
       state.error.value = undefined;
+      state.initialized.value = false;
     },
   };
 }
 
 export function abortable(key: Primitives): AbortController {
-  if (AbortRegistry.has(key) && __DEV__) {
-    console.error("[IOCRAFT::TASK] ⟶ This Key Is Aredy Presenbt In registry");
+  if (!keyRegistry.has(key)) {
+    throw new Error(`[IOCRAFT::TASK] key '${String(key)}' is not registered — create a task with this key first`);
   }
+
+  if (AbortRegistry.has(key)) return AbortRegistry.get(key)!;
+
   const controller = new AbortController();
   AbortRegistry.set(key, controller);
   return controller;

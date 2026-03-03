@@ -1,9 +1,11 @@
+// types.ts
 import type { ComputedRef, Ref } from "vue";
 
 export type TaskStatus = "idle" | "loading" | "success" | "error";
 export type AsyncFn = (...args: unknown[]) => Promise<unknown>;
 export type TaskResult<TFn extends AsyncFn> = [Awaited<ReturnType<TFn>> | undefined, Error | undefined];
 export type Primitives = string | number | symbol;
+export type Optional<T> = T | undefined;
 
 export interface RetryConfig {
   count: number;
@@ -11,20 +13,13 @@ export interface RetryConfig {
   backoff?: boolean;
 }
 
-export interface PollingConfig {
-  interval: number;
-}
-
-export type Optional<T> = T | undefined;
-
-export interface PollerRef {
-  current: Optional<{
-    stop: () => void;
-  }>;
-}
-
 export interface ClearTimeOut {
   clear: () => void;
+}
+
+export interface TaskTracker {
+  pause: () => void;
+  resume: () => void;
 }
 
 export interface TaskOptions<TFn extends AsyncFn> {
@@ -33,12 +28,10 @@ export interface TaskOptions<TFn extends AsyncFn> {
   debounce?: number;
   timeout?: number;
   retry?: RetryConfig;
-  polling?: PollingConfig;
-  watch?: {
+  track?: {
     deps: () => Parameters<TFn>;
     immediate?: boolean;
   };
-
   onLoading?: () => void;
   onSuccess?: (data: Awaited<ReturnType<TFn>>) => void;
   onError?: (error: Error) => void;
@@ -57,11 +50,11 @@ export interface TaskState<TFn extends AsyncFn> {
   executionId: Ref<number>;
 }
 
-export interface TaskReturn<TFn extends AsyncFn> extends TaskState<TFn> {
+export interface TaskReturn<TFn extends AsyncFn> extends Omit<TaskState<TFn>, "executionId" | "initialized"> {
+  tracker?: TaskTracker;
   start: (...args: Parameters<TFn>) => Promise<TaskResult<TFn>>;
   run: (...args: Parameters<TFn>) => Promise<TaskResult<TFn>>;
   stop: () => void;
-  clear: () => void;
   reset: () => void;
   dispose: () => void;
 }
