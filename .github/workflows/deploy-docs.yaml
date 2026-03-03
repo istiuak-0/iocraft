@@ -5,7 +5,7 @@ on:
   push:
     branches: [main]
     paths:
-      - 'packages/docs/**'
+      - "packages/docs/**"
 
 permissions:
   contents: read
@@ -24,13 +24,13 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v5
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4.2.0
       - name: Setup Node.js
         uses: actions/setup-node@v6
         with:
           node-version: 20
-          cache: 'pnpm'
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4.2.0
+          cache: "pnpm"
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
