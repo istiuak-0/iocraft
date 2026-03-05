@@ -1,4 +1,4 @@
-export { obtain, obtainRaw, obtainNew, obtainNewRaw, exposeCtx, obtainCtx } from "./core/obtainers";
+export { obtain, obtainNew, exposeCtx, obtainCtx } from "./core/obtainers";
 export { iocraft } from "./core/plugin";
 export { attach } from "./core/attach";
 export { getServiceMeta } from "./core/utils";

@@ -1,6 +1,6 @@
 import { watch, type WatchHandle } from "vue";
-import type { AsyncFn, Optional, Primitives, TaskOptions, TaskResult, TaskReturn, TaskTracker } from "./types";
-import { AbortRegistry, abortTask, createDebounce, createExecution, createTaskState, keyRegistry, releaseKey } from "./utils";
+import type { AsyncFn, Optional, Primitives, TaskOptions, TaskResult, TaskReturn } from "./types";
+import { AbortRegistry, abortTask, createDebounce, createExecution, createTaskState, keyRegistry } from "./utils";
 
 /**
  *
@@ -23,16 +23,11 @@ export function task<TFn extends AsyncFn>(options: TaskOptions<TFn>): TaskReturn
   const { execute } = createExecution(options, state);
   const debounce = createDebounce();
 
-  let stopWatch: Optional<WatchHandle>;
-  let tracker: Optional<TaskTracker>;
+  let trackRef: Optional<WatchHandle>;
 
   if (options.track) {
     const { deps, immediate } = options.track;
-    stopWatch = watch(deps, (newArgs) => execute(...newArgs), { immediate });
-    tracker = {
-      pause: () => stopWatch!.pause(),
-      resume: () => stopWatch!.resume(),
-    };
+    trackRef = watch(deps, (newArgs) => execute(...newArgs), { immediate });
   }
 
   return {
@@ -43,7 +38,7 @@ export function task<TFn extends AsyncFn>(options: TaskOptions<TFn>): TaskReturn
     isIdle: state.isIdle,
     isError: state.isError,
     isSuccess: state.isSuccess,
-    tracker,
+    trackRef,
     run(...args: Parameters<TFn>): Promise<TaskResult<TFn>> {
       return options.debounce ? debounce(() => execute(...args), options.debounce) : execute(...args);
     },
@@ -60,7 +55,6 @@ export function task<TFn extends AsyncFn>(options: TaskOptions<TFn>): TaskReturn
         return;
       }
       abortTask(options.key);
-      AbortRegistry.delete(options.key);
       state.executionId.value++;
       state.status.value = "idle";
       state.error.value = undefined;
@@ -69,17 +63,6 @@ export function task<TFn extends AsyncFn>(options: TaskOptions<TFn>): TaskReturn
     reset(): void {
       state.executionId.value++;
       abortTask(options.key);
-      state.status.value = "idle";
-      state.data.value = undefined;
-      state.error.value = undefined;
-      state.initialized.value = false;
-    },
-
-    dispose(): void {
-      state.executionId.value++;
-      stopWatch?.stop();
-      releaseKey(options.key);
-      if (options.key) keyRegistry.delete(options.key);
       state.status.value = "idle";
       state.data.value = undefined;
       state.error.value = undefined;

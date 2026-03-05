@@ -1,5 +1,5 @@
 // types.ts
-import type { ComputedRef, Ref } from "vue";
+import type { ComputedRef, Ref, WatchHandle } from "vue";
 
 export type TaskStatus = "idle" | "loading" | "success" | "error";
 export type AsyncFn = (...args: unknown[]) => Promise<unknown>;
@@ -15,11 +15,6 @@ export interface RetryConfig {
 
 export interface ClearTimeOut {
   clear: () => void;
-}
-
-export interface TaskTracker {
-  pause: () => void;
-  resume: () => void;
 }
 
 export interface TaskOptions<TFn extends AsyncFn> {
@@ -56,5 +51,5 @@ export interface TaskReturn<TFn extends AsyncFn> extends Omit<TaskState<TFn>, "e
   run: (...args: Parameters<TFn>) => Promise<TaskResult<TFn>>;
   stop: () => void;
   reset: () => void;
-  dispose: () => void;
+  trackRef: Optional<WatchHandle>;
 }

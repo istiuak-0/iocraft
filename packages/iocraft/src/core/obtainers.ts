@@ -10,7 +10,6 @@ import { getServiceMeta } from "./utils";
  * @export
  * @template {ServiceConstructor} T
  * @param {T} serviceClass
- * @returns {InstanceType<T>}
  */
 export function obtain<T extends ServiceConstructor>(serviceClass: T) {
   const serviceMeta = getServiceMeta(serviceClass);
@@ -36,42 +35,11 @@ export function obtain<T extends ServiceConstructor>(serviceClass: T) {
 }
 
 /**
- * obtain a global singleton service From Root Registry
- *
- * @export
- * @template {ServiceConstructor} T
- * @param {T} serviceClass
- * @returns {InstanceType<T>}
- */
-export function obtainRaw<T extends ServiceConstructor>(serviceClass: T) {
-  const serviceMeta = getServiceMeta(serviceClass);
-
-  if (RootRegistry.has(serviceMeta.token)) {
-    return RootRegistry.get(serviceMeta.token) as InstanceType<T>;
-  }
-
-  if (creationStack.has(serviceMeta.token)) {
-    throw new Error(`[IocRaft] Circular dependency detected on: ${serviceClass.name}\n`);
-  }
-
-  creationStack.add(serviceMeta.token);
-
-  try {
-    const instance = new serviceClass();
-    RootRegistry.set(serviceMeta.token, instance);
-    return instance as InstanceType<T>;
-  } finally {
-    creationStack.delete(serviceMeta.token);
-  }
-}
-
-/**
  * obtain a facade of a new Service Instance
  *
  * @export
  * @template {ServiceConstructor} T
  * @param {T} serviceClass
- * @returns {InstanceType<T>}
  */
 export function obtainNew<T extends ServiceConstructor>(serviceClass: T) {
   const serviceMeta = getServiceMeta(serviceClass);
@@ -91,36 +59,6 @@ export function obtainNew<T extends ServiceConstructor>(serviceClass: T) {
     }
 
     return createFacadeObj<InstanceType<T>>(instance);
-  } finally {
-    creationStack.delete(serviceMeta.token);
-  }
-}
-
-/**
- * obtain a new Service Instance
- *
- * @export
- * @template {ServiceConstructor} T
- * @param {T} serviceClass
- * @returns {InstanceType<T>}
- */
-export function obtainNewRaw<T extends ServiceConstructor>(serviceClass: T) {
-  const serviceMeta = getServiceMeta(serviceClass);
-
-  if (creationStack.has(serviceMeta.token)) {
-    throw new Error(`[IocRaft] Circular dependency detected on: ${serviceClass.name}\n`);
-  }
-
-  creationStack.add(serviceMeta.token);
-
-  try {
-    const componentInstance = getCurrentInstance();
-    const instance = new serviceClass();
-
-    if (componentInstance) {
-      bindLifecycleHooks(instance);
-    }
-    return instance as InstanceType<T>;
   } finally {
     creationStack.delete(serviceMeta.token);
   }

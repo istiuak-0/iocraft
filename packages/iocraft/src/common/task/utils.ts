@@ -1,15 +1,5 @@
 import { computed, ref } from "vue";
-import type {
-  AsyncFn,
-  ClearTimeOut,
-  Optional,
-  Primitives,
-  RetryConfig,
-  TaskOptions,
-  TaskResult,
-  TaskState,
-  TaskStatus,
-} from "./types";
+import type { AsyncFn, ClearTimeOut, Optional, Primitives, RetryConfig, TaskOptions, TaskResult, TaskState, TaskStatus } from "./types";
 
 export const AbortRegistry = new Map<Primitives, AbortController>();
 export const keyRegistry = new Set<Primitives>();
@@ -76,7 +66,6 @@ export async function runTask<TFn extends AsyncFn>(fn: () => ReturnType<TFn>, co
   let lastError: Error | undefined;
 
   for (let attempt = 0; attempt < totalAttemptsAllowed; attempt++) {
-
     if (attempt > 0) {
       const delay = getRetryDelay(config, attempt);
       if (delay) await new Promise((resolve) => setTimeout(resolve, delay));
@@ -94,7 +83,6 @@ export async function runTask<TFn extends AsyncFn>(fn: () => ReturnType<TFn>, co
   return [undefined, lastError];
 }
 
-
 export function createExecution<TFn extends AsyncFn>(options: TaskOptions<TFn>, state: TaskState<TFn>) {
   async function execute(...args: Parameters<TFn>): Promise<TaskResult<TFn>> {
     const currentExecutionId = ++state.executionId.value;
@@ -105,8 +93,10 @@ export function createExecution<TFn extends AsyncFn>(options: TaskOptions<TFn>, 
     /// Handle Timeout abort the request and update reactive states after timeout
     if (options.timeout) {
       timeout = createTimeout(() => {
-     if (!options.key) {
-          console.warn("[IOCRAFT::TASK] ⟶ timeout triggered but request won't be cancelled — add a key and use abortable() to enable cancellation");
+        if (!options.key) {
+          console.warn(
+            "[IOCRAFT::TASK] ⟶ timeout triggered but request won't be cancelled — add a key and use abortable() to enable cancellation",
+          );
         }
         abortTask(options.key);
 
@@ -157,10 +147,4 @@ export function createDebounce() {
       handle = setTimeout(() => resolve(fn()), ms);
     });
   };
-}
-
-export function releaseKey(key?: Primitives) {
-  if (key == null) return;
-  AbortRegistry.get(key)?.abort();
-  AbortRegistry.delete(key);
 }
