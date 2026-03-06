@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.2.7](https://github.com/istiuak-0/iocraft/compare/v0.2.6...v0.2.7) (2026-03-06)
+
+
+### Features
+
+* update task ([#36](https://github.com/istiuak-0/iocraft/issues/36)) ([ee20287](https://github.com/istiuak-0/iocraft/commit/ee202875a859fe44520305de1442813ea792ce2d))
+
 ## [0.2.6](https://github.com/istiuak-0/iocraft/compare/v0.2.5...v0.2.6) (2026-03-03)
 
 
