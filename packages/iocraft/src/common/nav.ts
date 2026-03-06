@@ -12,6 +12,7 @@ export class Nav {}
 export class RouterFacade {
   constructor(private router: Router) {}
 
+  // ─── Flattened current route getters
   get path() {
     return this.router.currentRoute.value.path;
   }
@@ -40,6 +41,7 @@ export class RouterFacade {
     return this.router.currentRoute.value.redirectedFrom;
   }
 
+  // ─── Router state
   get currentRoute() {
     return this.router.currentRoute;
   }
@@ -54,6 +56,7 @@ export class RouterFacade {
     this.router.listening = value;
   }
 
+  // ─── Navigation
   push(...args: Parameters<Router["push"]>) {
     return this.router.push(...args);
   }
@@ -70,10 +73,12 @@ export class RouterFacade {
     return this.router.forward();
   }
 
+  // ─── Route resolution
   resolve(...args: Parameters<Router["resolve"]>) {
     return this.router.resolve(...args);
   }
 
+  // ─── Route registry
   getRoutes() {
     return this.router.getRoutes();
   }
@@ -90,6 +95,7 @@ export class RouterFacade {
     return this.router.clearRoutes();
   }
 
+  // ─── Navigation guards
   beforeEach(...args: Parameters<Router["beforeEach"]>) {
     return this.router.beforeEach(...args);
   }
@@ -103,6 +109,7 @@ export class RouterFacade {
     return this.router.onError(...args);
   }
 
+  // ─── Lifecycle
   isReady() {
     return this.router.isReady();
   }
