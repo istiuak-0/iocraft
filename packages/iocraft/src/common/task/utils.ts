@@ -44,8 +44,8 @@ export function createTimeout(onTimeout: () => void, ms: number) {
 function getRetryDelay(config: RetryConfig, attempt: number): number | null {
   if (!config.delay) return null;
   return config.backoff
-    ? config.delay * 2 ** (attempt - 1) // exponential: 100ms, 200ms, 400ms...
-    : config.delay; // flat: 100ms, 100ms, 100ms...
+    ? config.delay * 2 ** (attempt - 1) // exponential: 100ms, 200ms, 400ms
+    : config.delay; // flat: 100ms, 100ms, 100ms
 }
 
 export async function runTask<TFn extends AsyncFn>(fn: () => ReturnType<TFn>, config: Optional<RetryConfig>): Promise<TaskResult<TFn>> {
