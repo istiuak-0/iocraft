@@ -12,6 +12,7 @@ export class Nav {}
 export class RouterFacade {
   constructor(private router: Router) {}
 
+  // ─── Flattened current route getters
   get path() {
     return this.router.currentRoute.value.path;
   }
@@ -36,10 +37,26 @@ export class RouterFacade {
   get meta() {
     return this.router.currentRoute.value.meta;
   }
+  get redirectedFrom() {
+    return this.router.currentRoute.value.redirectedFrom;
+  }
+
+  // ─── Router state
   get currentRoute() {
     return this.router.currentRoute;
   }
+  get options() {
+    return this.router.options;
+  }
 
+  get listening() {
+    return this.router.listening;
+  }
+  set listening(value: boolean) {
+    this.router.listening = value;
+  }
+
+  // ─── Navigation
   push(...args: Parameters<Router["push"]>) {
     return this.router.push(...args);
   }
@@ -55,16 +72,30 @@ export class RouterFacade {
   forward() {
     return this.router.forward();
   }
+
+  // ─── Route resolution
   resolve(...args: Parameters<Router["resolve"]>) {
     return this.router.resolve(...args);
   }
+
+  // ─── Route registry
   getRoutes() {
     return this.router.getRoutes();
   }
   hasRoute(...args: Parameters<Router["hasRoute"]>) {
     return this.router.hasRoute(...args);
   }
+  addRoute(...args: Parameters<Router["addRoute"]>) {
+    return this.router.addRoute(...args);
+  }
+  removeRoute(...args: Parameters<Router["removeRoute"]>) {
+    return this.router.removeRoute(...args);
+  }
+  clearRoutes() {
+    return this.router.clearRoutes();
+  }
 
+  // ─── Navigation guards
   beforeEach(...args: Parameters<Router["beforeEach"]>) {
     return this.router.beforeEach(...args);
   }
@@ -78,16 +109,7 @@ export class RouterFacade {
     return this.router.onError(...args);
   }
 
-  addRoute(...args: Parameters<Router["addRoute"]>) {
-    return this.router.addRoute(...args);
-  }
-  removeRoute(...args: Parameters<Router["removeRoute"]>) {
-    return this.router.removeRoute(...args);
-  }
-  clearRoutes() {
-    return this.router.clearRoutes();
-  }
-
+  // ─── Lifecycle
   isReady() {
     return this.router.isReady();
   }
