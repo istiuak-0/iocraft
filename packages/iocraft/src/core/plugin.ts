@@ -1,13 +1,12 @@
 import { type FunctionPlugin } from "vue";
-import { Nav } from "../common/nav";
-import { generateRouterFacade } from "./facade";
+import { Nav, RouterFacade } from "../common/nav";
 import { RootRegistry } from "./internals";
 import type { PluginOptions } from "./types";
 import { getServiceMeta } from "./utils";
 
 export const iocraft: FunctionPlugin<[Partial<PluginOptions>?]> = (_app, options?: Partial<PluginOptions>) => {
   if (options?.router) {
-    RootRegistry.set(getServiceMeta(Nav).token, generateRouterFacade(options.router));
+    RootRegistry.set(getServiceMeta(Nav).token, new RouterFacade(options.router));
   }
 
   // Eagerly create Service instances

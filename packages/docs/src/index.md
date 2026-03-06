@@ -4,7 +4,7 @@ layout: home
 hero:
   name: "iocraft"
   text: "Dependency Injection for Vue 3"
-  tagline: A lightweight IOC container for Vue 3 with reactive services and async task management
+  tagline: A lightweight IOC container for Vue 3
   actions:
     - theme: brand
       text: Get Started

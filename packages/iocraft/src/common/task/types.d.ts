@@ -1,4 +1,3 @@
-// types.ts
 import type { ComputedRef, Ref, WatchHandle } from "vue";
 
 export type TaskStatus = "idle" | "loading" | "success" | "error";
