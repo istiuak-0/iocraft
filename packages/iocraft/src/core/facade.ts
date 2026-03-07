@@ -12,8 +12,8 @@ const NativeKeys = new Set([
   ...Object.getOwnPropertySymbols(Object.prototype),
   ...Object.getOwnPropertyNames(Function.prototype),
   ...Object.getOwnPropertySymbols(Function.prototype),
-  ...Object.getOwnPropertyNames(Array.prototype),
-  ...Object.getOwnPropertySymbols(Array.prototype),
+  // ...Object.getOwnPropertyNames(Array.prototype),
+  // ...Object.getOwnPropertySymbols(Array.prototype),
 ]);
 
 function addInstanceProperties<T extends object>(
