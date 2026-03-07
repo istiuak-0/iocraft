@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.2.8](https://github.com/istiuak-0/iocraft/compare/v0.2.7...v0.2.8) (2026-03-07)
+
+
+### Features
+
+* update nav service and facade implementation ([#38](https://github.com/istiuak-0/iocraft/issues/38)) ([77c82e0](https://github.com/istiuak-0/iocraft/commit/77c82e0f0d1b88f511d6cddb128421fdb7689b08))
+
 ## [0.2.7](https://github.com/istiuak-0/iocraft/compare/v0.2.6...v0.2.7) (2026-03-06)
 
 
