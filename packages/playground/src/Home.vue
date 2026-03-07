@@ -3,6 +3,10 @@ import { obtain } from 'iocraft';
 import { Nav } from 'iocraft/common';
 
 const nav = obtain(Nav);
+const { push } = obtain(Nav)
+
+console.log(push);
+
 </script>
 
 <template>
