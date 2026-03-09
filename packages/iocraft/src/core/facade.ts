@@ -1,7 +1,7 @@
-import type { ServiceConstructor } from './types';
+import type { ServiceConstructor } from "./types";
 
 function hasKey(obj: Record<PropertyKey, unknown>, key: PropertyKey): boolean {
-  if (typeof key === 'symbol') {
+  if (typeof key === "symbol") {
     return Object.getOwnPropertySymbols(obj).includes(key);
   }
   return Object.hasOwn(obj, key);
@@ -18,7 +18,7 @@ const NativeKeys = new Set([
 
 function addInstanceProperties<T extends object>(
   serviceInstance: InstanceType<ServiceConstructor<T>>,
-  targetObj: Record<PropertyKey, unknown>
+  targetObj: Record<PropertyKey, unknown>,
 ) {
   const ownKeys = [...Object.getOwnPropertyNames(serviceInstance), ...Object.getOwnPropertySymbols(serviceInstance)];
 
@@ -27,7 +27,7 @@ function addInstanceProperties<T extends object>(
 
     const descriptor = Object.getOwnPropertyDescriptor(serviceInstance, key)!;
 
-    if (typeof descriptor.value === 'function') {
+    if (typeof descriptor.value === "function") {
       console.warn(`[IOCRAFT]: Instance method "${String(key)}" found as own property. Consider moving to prototype.`);
       continue;
     }
@@ -51,7 +51,7 @@ function addInstanceProperties<T extends object>(
 
 function addPrototypeProperties<T extends object>(
   serviceInstance: InstanceType<ServiceConstructor<T>>,
-  targetObj: Record<PropertyKey, unknown>
+  targetObj: Record<PropertyKey, unknown>,
 ) {
   let currentProto = Object.getPrototypeOf(serviceInstance);
 
@@ -72,7 +72,7 @@ function addPrototypeProperties<T extends object>(
           enumerable: true,
           configurable: true,
         });
-      } else if (typeof descriptor.value === 'function') {
+      } else if (typeof descriptor.value === "function") {
         targetObj[key] = descriptor.value.bind(serviceInstance);
       }
     }
@@ -95,5 +95,12 @@ export function createFacadeObj<T extends object>(serviceInstance: object) {
 
   addInstanceProperties(serviceInstance, targetObj);
   addPrototypeProperties(serviceInstance, targetObj);
+
+  Object.defineProperty(targetObj, "constructor", {
+    get: () => serviceInstance.constructor,
+    enumerable: false,
+    configurable: true,
+  });
+
   return targetObj as T;
 }
