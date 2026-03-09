@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.2.9](https://github.com/istiuak-0/iocraft/compare/v0.2.8...v0.2.9) (2026-03-09)
+
+
+### Bug Fixes
+
+* facade initiation ([#40](https://github.com/istiuak-0/iocraft/issues/40)) ([48cda2e](https://github.com/istiuak-0/iocraft/commit/48cda2e60211616515977e249412f8b0f7293e6f))
+
 ## [0.2.8](https://github.com/istiuak-0/iocraft/compare/v0.2.7...v0.2.8) (2026-03-07)
 
 
