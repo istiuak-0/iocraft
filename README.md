@@ -2,7 +2,7 @@
   <img src="./assets/banner.svg" alt="iocraft" width="100%" />
 
 [![npm version](https://img.shields.io/npm/v/iocraft?color=3dd68c&labelColor=0d0d0e&label=npm)](https://www.npmjs.com/package/iocraft)
-[![license](https://img.shields.io/github/license/istiuak-0/iocraft?color=3dd68c&labelColor=0d0d0e)](https://github.com/istiuak-0/iocraft/blob/main/LICENSE)
+[![license](https://img.shields.io/badge/license-MIT-3dd68c?labelColor=0d0d0e)](./LICENSE)
 [![typescript](https://img.shields.io/badge/TypeScript-ready-3dd68c?labelColor=0d0d0e)](https://www.typescriptlang.org/)
 
 </div>
@@ -24,7 +24,6 @@
 - [Context (Scoped) Services](#context-scoped-services)
 - [Lifecycle Hooks](#lifecycle-hooks)
 - [Router Integration](#router-integration)
-- [API Reference](#api-reference)
 
 ---
 
@@ -41,8 +40,6 @@ pnpm add iocraft
 ---
 
 ## Setup
-
-Register the plugin in your Vue app entry point.
 
 ```ts
 import { createApp } from 'vue'
@@ -75,23 +72,28 @@ app.use(iocraft, {
 
 ## Core Concepts
 
-iocraft solves a specific problem: Vue's reactivity system works at the property level, but when you destructure a plain object returned from a composable you lose the reactive bindings. iocraft wraps every service in a **facade** — a proxy object that re-exposes all properties and methods through proper getters/setters — so destructuring always stays reactive.
+When you destructure a plain class instance or reactive object, Vue's reactivity bindings are severed — you get a snapshot, not a live reference.
 
 ```ts
-// Without iocraft — reactivity lost on destructure
-const { count } = useSomeComposable()    // count is now a plain value
-
-// With iocraft — reactivity preserved
-const { count } = obtain(CounterService) // count stays reactive
+// Destructuring a class instance — reactivity lost
+const service = new CounterService()
+const { count } = service // count is a plain value, no longer reactive
 ```
 
-Services are plain TypeScript classes. No special base class, no decorators beyond `@attach()`, no magic.
+iocraft wraps every resolved service in a **facade** — a thin object that re-exposes every property and method through proper getters and setters bound back to the original reactive instance. Destructuring the facade gives you live reactive references.
+
+```ts
+// Destructuring a facade — reactivity preserved
+const { count, increment } = obtain(CounterService)
+```
+
+Services are plain TypeScript classes. Use `ref`, `computed`, `watch`, `reactive` — anything from Vue — directly inside them. No special base class required.
 
 ---
 
 ## Services
 
-Decorate a class with `@attach()` to register it with the DI system. That is all that is required.
+Decorate a class with `@attach()` to register it with the DI system.
 
 ```ts
 import { ref, computed } from 'vue'
@@ -112,69 +114,85 @@ export class CounterService {
 }
 ```
 
-Services are plain classes. You can use `ref`, `computed`, `watch`, `reactive` — anything from Vue — directly inside them.
+`@attach()` assigns a unique symbol token to the class that the registry uses for lookup. Without it, iocraft cannot resolve the service and will throw.
 
 ---
 
 ## Obtaining Services
 
-iocraft provides four functions to resolve services, each covering a different lifetime and use case.
-
 ### `obtain` — Global Singleton
 
-Resolves a singleton from the root registry. The instance is created once and shared across the entire app. Returns a **facade** — safe to destructure.
+Resolves a singleton from the root registry. The instance is created on first call and reused for the lifetime of the app. Returns a **facade** — safe to destructure with full reactivity.
 
-```ts
+```vue
+<script setup lang="ts">
 import { obtain } from 'iocraft'
 import { CounterService } from './services'
 
-const { count, increment } = obtain(CounterService)
-```
+// use as an object — all access is reactive
+const counter = obtain(CounterService)
 
-```html
+// or destructure — reactivity is preserved through the facade
+const { count, increment, reset } = obtain(CounterService)
+</script>
+
 <template>
-  <button @click="increment">{{ count }}</button>
+  <p>Count: {{ count }} — Double: {{ counter.double }}</p>
+  <button @click="increment">+1</button>
+  <button @click="reset">Reset</button>
 </template>
 ```
 
 ### `obtainNew` — Component-Scoped Instance
 
-Creates a fresh instance tied to the calling component's lifecycle. Lifecycle hooks defined on the service are automatically bound to the component. Returns a facade.
+Creates a fresh instance for each component that calls it. The instance is not shared with anything else. If the service defines lifecycle hook methods, they are automatically bound to the component that resolved it.
 
-```ts
+```vue
+<script setup lang="ts">
 import { obtainNew } from 'iocraft'
 import { FormService } from './services'
 
-const { values, submit, reset } = obtainNew(FormService)
+const { values, errors, submit, reset } = obtainNew(FormService)
+</script>
+
+<template>
+  <form @submit.prevent="submit">
+    <input v-model="values.email" />
+    <span v-if="errors.email">{{ errors.email }}</span>
+    <button type="submit">Submit</button>
+  </form>
+</template>
 ```
 
 ### `obtainRaw` — Raw Singleton
 
-Same as `obtain` but returns the actual class instance instead of a facade. Use this when you need to pass the service to another service or access internals not exposed on the facade.
+Same as `obtain` but returns the actual class instance with no facade. Use this when you need to pass a service into another service, or when you need access to private internals.
 
 ```ts
 import { obtainRaw } from 'iocraft'
 import { AuthService } from './services'
 
-const auth = obtainRaw(AuthService)
+const auth = obtainRaw(AuthService) // raw instance
 ```
 
 ### `obtainRawNew` — Raw Component-Scoped Instance
 
-Creates a fresh raw instance tied to the component lifecycle. Useful for composing services internally.
+Creates a fresh raw instance bound to the current component's lifecycle. No facade is applied. Useful when composing services that need to call each other directly.
 
 ```ts
 import { obtainRawNew } from 'iocraft'
 import { UploadService } from './services'
 
-const uploader = obtainRawNew(UploadService)
+const uploader = obtainRawNew(UploadService) // raw instance, component-scoped
 ```
 
 ---
 
 ## Store
 
-`store()` is a factory that returns a base class with reactive state management utilities built in. Extend it in a service to get a full reactive store without repeating the same boilerplate across your app.
+`store()` is a factory that generates a reactive base class you can extend. It is designed to replace Pinia stores for cases where your state lives inside a service — you get reactive state, computed values, watchers, and a reset mechanism without any external store library.
+
+### Defining a store
 
 ```ts
 import { attach, store } from 'iocraft'
@@ -191,8 +209,20 @@ export class UserStore extends store<UserState>({
   name: '',
   role: 'guest',
 }) {
+  // Computed via getter
   get isAdmin() {
     return this.state.role === 'admin'
+  }
+
+  // Derived computed ref — reactive in templates
+  nameUppercase = this.compute(s => s.name.toUpperCase())
+
+  // Watch for changes and react
+  constructor() {
+    super()
+    this.observe('role', (next, prev) => {
+      console.log(`Role changed from ${prev} to ${next}`)
+    })
   }
 
   setUser(id: string, name: string, role: UserState['role']) {
@@ -205,63 +235,142 @@ export class UserStore extends store<UserState>({
 }
 ```
 
-Resolve it like any other service:
+### Using the store
 
-```ts
-const userStore = obtain(UserStore)
+```vue
+<script setup lang="ts">
+import { obtain } from 'iocraft'
+import { UserStore } from './stores'
 
-userStore.state.name            // reactive
-userStore.snapshot              // plain object copy of current state
-userStore.update({ name: '' }) // partial update
-userStore.reset()               // back to initial state
+const user = obtain(UserStore)
+
+// state is fully reactive — use directly in template
+// snapshot gives you a plain object copy when you need to serialize
+console.log(user.snapshot) // { id: null, name: '', role: 'guest' }
+</script>
+
+<template>
+  <p>{{ user.state.name }}</p>
+  <p>{{ user.nameUppercase }}</p>
+  <button v-if="user.isAdmin" @click="user.logout">Logout</button>
+</template>
 ```
 
 ### Store API
 
-| Method | Description |
-|--------|-------------|
-| `state` | Reactive state object |
-| `snapshot` | Raw (non-reactive) copy via `toRaw` |
-| `update(partial)` | Merge a partial object into state |
-| `pick(key)` | Read a single key from state |
-| `compute(fn)` | Return a `ComputedRef` derived from state |
-| `observe(key, cb)` | Watch a specific key for changes |
-| `observe(fn, cb)` | Watch a derived value for changes |
-| `effect(fn)` | Run a `watchEffect` scoped to state |
-| `reset()` | Restore state to initial values |
+**`state`**
+The reactive state object. Mutate it directly or via `update`. Access it in templates as `store.state.key`.
+
+```ts
+user.state.name       // read
+user.state.name = 'x' // write — reactive
+```
+
+**`update(partial)`**
+Merges a partial object into state. Prefer this over direct mutation when updating multiple keys at once.
+
+```ts
+user.update({ name: 'Alice', role: 'admin' })
+```
+
+**`snapshot`**
+Returns a plain (non-reactive) copy of the current state via `toRaw`. Use when you need to serialize state, log it, or pass it outside Vue's reactivity system.
+
+```ts
+const data = user.snapshot
+JSON.stringify(data) // safe — no reactive proxies
+```
+
+**`pick(key)`**
+Reads a single key from state. Useful when you only need one value and want a clean access pattern.
+
+```ts
+const role = user.pick('role') // equivalent to user.state.role
+```
+
+**`compute(fn)`**
+Returns a `ComputedRef` derived from state. Stays reactive. Ideal for derived values you want to expose from the store.
+
+```ts
+@attach()
+class CartStore extends store({ items: [] as string[], discount: 0 }) {
+  total = this.compute(s => s.items.length - s.discount)
+}
+
+const cart = obtain(CartStore)
+cart.total.value // reactive computed
+```
+
+**`observe(key, callback)` / `observe(fn, callback)`**
+Watches state for changes. Accepts either a key name or a getter function for derived observation.
+
+```ts
+// Watch a single key
+this.observe('role', (next, prev) => {
+  if (next === 'admin') this.loadAdminData()
+})
+
+// Watch a derived value
+this.observe(s => s.items.length, (next) => {
+  console.log(`Cart has ${next} items`)
+})
+```
+
+**`effect(fn)`**
+Runs a `watchEffect` scoped to state. Re-runs whenever any accessed state property changes.
+
+```ts
+this.effect(s => {
+  document.title = `${s.name} — Dashboard`
+})
+```
+
+**`reset()`**
+Restores state to the values passed to `store()` at definition time.
+
+```ts
+user.reset() // back to { id: null, name: '', role: 'guest' }
+```
 
 ---
 
 ## Context (Scoped) Services
 
-Scoped services are provided by a parent component and injected into its descendants using Vue's `provide` / `inject` under the hood.
+Context services are provided by a parent component and injected into any descendant. Under the hood this uses Vue's `provide` / `inject`.
 
-**Parent component — provide:**
+**Parent — provide:**
 
-```ts
+```vue
+<script setup lang="ts">
 import { exposeCtx, obtainNew } from 'iocraft'
 import { CartService } from './services'
 
+// create a fresh instance scoped to this component tree
 const cart = obtainNew(CartService)
 exposeCtx(cart)
+</script>
 ```
 
-**Child component — inject:**
+**Child — inject:**
 
-```ts
+```vue
+<script setup lang="ts">
 import { obtainCtx } from 'iocraft'
 import { CartService } from './services'
 
-const cart = obtainCtx(CartService) // InstanceType<CartService> | undefined
+const cart = obtainCtx(CartService) // CartService instance | undefined
+</script>
 ```
 
-This is useful for feature-level state that should not be global — shopping carts, multi-step forms, wizard flows.
+Use this for state that should be shared within a subtree but not globally — shopping carts, multi-step wizards, nested form sections.
 
 ---
 
 ## Lifecycle Hooks
 
-Services can implement Vue lifecycle hooks by defining methods with the matching name. When resolved via `obtainNew` or `obtainRawNew`, iocraft automatically binds them to the calling component.
+Services resolved with `obtainNew` or `obtainRawNew` can define Vue lifecycle hook methods directly on the class. iocraft detects and binds them to the component that resolved the service.
+
+iocraft exports typed interfaces for every supported hook so your service can implement them safely without typos.
 
 ```ts
 import { ref } from 'vue'
@@ -287,140 +396,63 @@ export class PollingService implements OnMounted, OnUnmounted {
 }
 ```
 
-**Supported hooks:**
+```vue
+<script setup lang="ts">
+import { obtainNew } from 'iocraft'
+import { PollingService } from './services'
 
-`onMounted` · `onUnmounted` · `onUpdated` · `onBeforeMount` · `onBeforeUpdate` · `onBeforeUnmount` · `onErrorCaptured` · `onActivated` · `onDeactivated` · `onRenderTracked` · `onRenderTriggered` · `onServerPrefetch` · `onScopeDispose`
+// onMounted and onUnmounted on the service fire with this component
+const { data } = obtainNew(PollingService)
+</script>
+```
 
-> Lifecycle hooks only fire when resolved with `obtainNew` or `obtainRawNew` inside a component. Global singletons via `obtain` have no component context to bind to.
+**Exported hook interfaces:**
+
+`OnMounted` · `OnUnmounted` · `OnUpdated` · `OnBeforeMount` · `OnBeforeUpdate` · `OnBeforeUnmount` · `OnErrorCaptured` · `OnActivated` · `OnDeactivated` · `OnRenderTracked` · `OnRenderTriggered` · `OnServerPrefetch` · `OnScopeDispose`
+
+> Lifecycle hooks only fire when the service is resolved with `obtainNew` or `obtainRawNew` inside a component. Global singletons resolved via `obtain` have no component context to bind to.
 
 ---
 
 ## Router Integration
 
-Pass your router to the plugin and iocraft registers a built-in `Nav` service that wraps the router with flat, reactive getters.
+Pass your router to the plugin and iocraft registers a built-in `Nav` service that wraps `vue-router` with flat, reactive getters. No more importing `useRouter` and `useRoute` separately.
 
 ```ts
 app.use(iocraft, { router })
 ```
 
-```ts
+```vue
+<script setup lang="ts">
 import { obtain } from 'iocraft'
-import { Nav } from 'iocraft'
+import { Nav } from 'iocraft/common'
 
-const { path, query, push, back } = obtain(Nav)
+const nav = obtain(Nav)
+const { push } = obtain(Nav) // destructuring also works
+</script>
+
+<template>
+  <p>Path: <code>{{ nav.path }}</code></p>
+  <p>Name: <code>{{ nav.name?.toString() ?? '-' }}</code></p>
+  <p>Full path: <code>{{ nav.fullPath }}</code></p>
+  <button @click="nav.push('/home')">Home</button>
+  <button @click="nav.back()">Back</button>
+  <button @click="nav.forward()">Forward</button>
+</template>
 ```
 
-`Nav` exposes the full `vue-router` surface as reactive properties and bound methods — no need to call `useRouter()` or `useRoute()` separately.
+**Reactive route properties:** `path` · `name` · `params` · `query` · `hash` · `fullPath` · `meta` · `matched` · `redirectedFrom` · `currentRoute`
 
-| Property / Method | Description |
-|---|---|
-| `path`, `name`, `params`, `query`, `hash`, `fullPath` | Current route, reactive |
-| `meta`, `matched`, `redirectedFrom` | Route metadata |
-| `currentRoute` | Full `Ref<RouteLocationNormalized>` |
-| `push(to)`, `replace(to)` | Navigate |
-| `go(delta)`, `back()`, `forward()` | History navigation |
-| `resolve(to)` | Resolve without navigating |
-| `addRoute()`, `removeRoute()`, `getRoutes()`, `hasRoute()`, `clearRoutes()` | Route registry |
-| `beforeEach()`, `beforeResolve()`, `afterEach()`, `onError()` | Navigation guards |
-| `isReady()` | Wait for initial navigation to complete |
+**Navigation:** `push(to)` · `replace(to)` · `go(delta)` · `back()` · `forward()`
 
----
+**Route registry:** `addRoute()` · `removeRoute()` · `getRoutes()` · `hasRoute()` · `clearRoutes()`
 
-## API Reference
+**Guards:** `beforeEach()` · `beforeResolve()` · `afterEach()` · `onError()`
 
-### `@attach()`
-
-Attaches a unique symbol token to a class, making it resolvable by the DI system. Required on every service class.
-
-```ts
-@attach()
-export class MyService { }
-```
-
----
-
-### `obtain(ServiceClass)`
-
-Returns a reactive facade of the global singleton. Creates the instance on first call, then caches it.
-
-```ts
-const { prop, method } = obtain(MyService) // safe to destructure
-```
-
----
-
-### `obtainNew(ServiceClass)`
-
-Returns a reactive facade of a new instance bound to the current component's lifecycle.
-
-```ts
-const facade = obtainNew(MyService)
-```
-
----
-
-### `obtainRaw(ServiceClass)`
-
-Returns the raw singleton instance with no facade wrapping.
-
-```ts
-const instance = obtainRaw(MyService)
-```
-
----
-
-### `obtainRawNew(ServiceClass)`
-
-Returns a raw new instance bound to the current component's lifecycle.
-
-```ts
-const instance = obtainRawNew(MyService)
-```
-
----
-
-### `exposeCtx(serviceInstance)`
-
-Provides a service instance to the component tree below the current component.
-
-```ts
-exposeCtx(obtainNew(MyService))
-```
-
----
-
-### `obtainCtx(ServiceClass)`
-
-Injects a service provided by an ancestor component. Returns `undefined` if not found.
-
-```ts
-const service = obtainCtx(MyService)
-```
-
----
-
-### `store(initialState)`
-
-Returns a base class with reactive state utilities. Extend it inside a service decorated with `@attach()`.
-
-```ts
-@attach()
-export class MyStore extends store({ count: 0 }) { }
-```
-
----
-
-### `iocraft` — Vue Plugin
-
-```ts
-app.use(iocraft, {
-  router?: Router                  // registers the Nav service
-  eagerLoad?: ServiceConstructor[] // instantiate these services at boot
-})
-```
+**Other:** `resolve(to)` · `isReady()`
 
 ---
 
 ## License
 
-MIT · [istiuak-0](https://github.com/istiuak-0)
+MIT · [istiuak-0](https://github.com/istiuak-0/iocraft)
