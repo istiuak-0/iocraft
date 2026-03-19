@@ -7,11 +7,10 @@
 
 </div>
 
----
 
-**iocraft** is a dependency injection container for Vue 3 built on the Composition API. It lets you write plain TypeScript classes as services — with full Vue reactivity, lifecycle hooks, and zero boilerplate — and resolve them anywhere in your app without breaking reactivity when destructuring.
 
----
+**iocraft** is a dependency injection container for Vue 3 built on the Composition API. It lets you write plain TypeScript classes as services — with full Vue reactivity, lifecycle hooks, and zero boilerplate — and resolve them anywhere in your app without breaking reactivity.
+
 
 ## Table of Contents
 
@@ -25,7 +24,6 @@
 - [Lifecycle Hooks](#lifecycle-hooks)
 - [Router Integration](#router-integration)
 
----
 
 ## Installation
 
@@ -33,11 +31,6 @@
 npm install iocraft
 ```
 
-```bash
-pnpm add iocraft
-```
-
----
 
 ## Setup
 
@@ -68,7 +61,6 @@ app.use(iocraft, {
 })
 ```
 
----
 
 ## Core Concepts
 
@@ -89,7 +81,7 @@ const { count, increment } = obtain(CounterService)
 
 Services are plain TypeScript classes. Use `ref`, `computed`, `watch`, `reactive` — anything from Vue — directly inside them. No special base class required.
 
----
+
 
 ## Services
 
@@ -116,7 +108,7 @@ export class CounterService {
 
 `@attach()` assigns a unique symbol token to the class that the registry uses for lookup. Without it, iocraft cannot resolve the service and will throw.
 
----
+
 
 ## Obtaining Services
 
