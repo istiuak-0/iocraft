@@ -16,7 +16,6 @@
 
 - [Installation](#installation)
 - [Setup](#setup)
-- [Core Concepts](#core-concepts)
 - [Services](#services)
 - [Obtaining Services](#obtaining-services)
 - [Store](#store)
@@ -57,31 +56,9 @@ const router = createRouter({ /* ... */ })
 
 app.use(iocraft, {
   router,                       // enables the built-in Nav service
-  eagerLoad: [AuthService],     // instantiate on boot, not on first use
+  eagerLoad: [AuthService],     // eagerly initialte these services on app start
 })
 ```
-
-
-## Core Concepts
-
-When you destructure a plain class instance or reactive object, Vue's reactivity bindings are severed — you get a snapshot, not a live reference.
-
-```ts
-// Destructuring a class instance — reactivity lost
-const service = new CounterService()
-const { count } = service // count is a plain value, no longer reactive
-```
-
-iocraft wraps every resolved service in a **facade** — a thin object that re-exposes every property and method through proper getters and setters bound back to the original reactive instance. Destructuring the facade gives you live reactive references.
-
-```ts
-// Destructuring a facade — reactivity preserved
-const { count, increment } = obtain(CounterService)
-```
-
-Services are plain TypeScript classes. Use `ref`, `computed`, `watch`, `reactive` — anything from Vue — directly inside them. No special base class required.
-
-
 
 ## Services
 
