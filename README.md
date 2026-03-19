@@ -1,11 +1,8 @@
 <div align="center">
   <img src="./assets/banner.svg" alt="iocraft" width="100%" />
-</div>
 
-<div align="center">
-
-[![npm](https://img.shields.io/npm/v/iocraft?color=3dd68c&labelColor=0d0d0e)](https://www.npmjs.com/package/iocraft)
-[![license](https://img.shields.io/github/license/your-org/iocraft?color=3dd68c&labelColor=0d0d0e)](./LICENSE)
+[![npm version](https://img.shields.io/npm/v/iocraft?color=3dd68c&labelColor=0d0d0e&label=npm)](https://www.npmjs.com/package/iocraft)
+[![license](https://img.shields.io/github/license/istiuak-0/iocraft?color=3dd68c&labelColor=0d0d0e)](https://github.com/istiuak-0/iocraft/blob/main/LICENSE)
 [![typescript](https://img.shields.io/badge/TypeScript-ready-3dd68c?labelColor=0d0d0e)](https://www.typescriptlang.org/)
 
 </div>
@@ -82,10 +79,10 @@ iocraft solves a specific problem: Vue's reactivity system works at the property
 
 ```ts
 // Without iocraft — reactivity lost on destructure
-const { count } = useSomeComposable()   // count is now a plain value
+const { count } = useSomeComposable()    // count is now a plain value
 
 // With iocraft — reactivity preserved
-const { count } = obtain(CounterService)  // count stays reactive
+const { count } = obtain(CounterService) // count stays reactive
 ```
 
 Services are plain TypeScript classes. No special base class, no decorators beyond `@attach()`, no magic.
@@ -255,7 +252,7 @@ exposeCtx(cart)
 import { obtainCtx } from 'iocraft'
 import { CartService } from './services'
 
-const cart = obtainCtx(CartService)  // InstanceType<CartService> | undefined
+const cart = obtainCtx(CartService) // InstanceType<CartService> | undefined
 ```
 
 This is useful for feature-level state that should not be global — shopping carts, multi-step forms, wizard flows.
@@ -347,7 +344,7 @@ export class MyService { }
 Returns a reactive facade of the global singleton. Creates the instance on first call, then caches it.
 
 ```ts
-const { prop, method } = obtain(MyService)  // safe to destructure
+const { prop, method } = obtain(MyService) // safe to destructure
 ```
 
 ---
@@ -426,4 +423,4 @@ app.use(iocraft, {
 
 ## License
 
-MIT
+MIT · [istiuak-0](https://github.com/istiuak-0)
