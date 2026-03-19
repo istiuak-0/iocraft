@@ -83,12 +83,6 @@ function addPrototypeProperties<T extends object>(
 
 /**
  * CREATES A FACADE OBJECT
- *
- * @export
- * @template {object} T
- * @param {ServiceConstructor<T>} serviceClass
- * @param {InstanceType<ServiceConstructor<T>>} serviceInstance
- * @returns {{}}
  */
 export function createFacadeObj<T extends object>(serviceInstance: object) {
   const targetObj = {};

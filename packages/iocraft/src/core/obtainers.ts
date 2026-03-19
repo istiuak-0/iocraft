@@ -6,10 +6,6 @@ import { getServiceMeta } from "./utils";
 
 /**
  * obtain Facade of a global singleton service From Root Registry
- *
- * @export
- * @template {ServiceConstructor} T
- * @param {T} serviceClass
  */
 export function obtain<T extends ServiceConstructor>(serviceClass: T) {
   const serviceMeta = getServiceMeta(serviceClass);
@@ -34,12 +30,64 @@ export function obtain<T extends ServiceConstructor>(serviceClass: T) {
   }
 }
 
+
+/**
+ * obtain raw instance is a service from service registry
+ */
+export function obtainRaw<T extends ServiceConstructor>(serviceClass: T) {
+  const serviceMeta = getServiceMeta(serviceClass);
+
+  if (RootRegistry.has(serviceMeta.token)) {
+    return RootRegistry.get(serviceMeta.token) as InstanceType<T>;
+  }
+
+  if (creationStack.has(serviceMeta.token)) {
+    throw new Error(`[IocRaft] Circular dependency detected on: ${serviceClass.name}\n`);
+  }
+
+  creationStack.add(serviceMeta.token);
+
+  try {
+    const instance = new serviceClass();
+    RootRegistry.set(serviceMeta.token, instance);
+    return instance as InstanceType<T>;
+  } finally {
+    creationStack.delete(serviceMeta.token);
+  }
+}
+
+
+
+
+/**
+ * obtain a raw instance of the service that is transient and not tied to service registry
+ */
+export function obtainRawNew<T extends ServiceConstructor>(serviceClass: T) {
+  const serviceMeta = getServiceMeta(serviceClass);
+
+  if (creationStack.has(serviceMeta.token)) {
+    throw new Error(`[IocRaft] Circular dependency detected on: ${serviceClass.name}\n`);
+  }
+
+  creationStack.add(serviceMeta.token);
+
+  try {
+    const componentInstance = getCurrentInstance();
+    const instance = new serviceClass();
+
+    if (componentInstance) {
+      bindLifecycleHooks(instance);
+    }
+    return instance as InstanceType<T>;
+  } finally {
+    creationStack.delete(serviceMeta.token);
+  }
+}
+
+
+
 /**
  * obtain a facade of a new Service Instance
- *
- * @export
- * @template {ServiceConstructor} T
- * @param {T} serviceClass
  */
 export function obtainNew<T extends ServiceConstructor>(serviceClass: T) {
   const serviceMeta = getServiceMeta(serviceClass);
@@ -64,12 +112,9 @@ export function obtainNew<T extends ServiceConstructor>(serviceClass: T) {
   }
 }
 
+
 /**
  * Expose a service to context
- *
- * @export
- * @template {ServiceConstructor} T
- * @param {InstanceType<T>} serviceInstance
  */
 export function exposeCtx<T extends ServiceConstructor>(serviceInstance: InstanceType<T>) {
   const serviceMeta = getServiceMeta(serviceInstance);
@@ -78,10 +123,6 @@ export function exposeCtx<T extends ServiceConstructor>(serviceInstance: Instanc
 
 /**
  * obtain A Service From Context
- *
- * @export
- * @template {ServiceConstructor} T
- * @param {T} serviceClass
  */
 export function obtainCtx<T extends ServiceConstructor>(serviceClass: T) {
   const serviceMeta = getServiceMeta(serviceClass);

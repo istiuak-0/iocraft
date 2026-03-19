@@ -3,7 +3,6 @@ import type { ServiceConstructor, ServiceMetadata } from "./types";
 
 /**
  * Attaches some internal meta data to a class that is needed for di system
- *
  */
 export function attach(){
   return function <C extends ServiceConstructor>(constructor: C) {
