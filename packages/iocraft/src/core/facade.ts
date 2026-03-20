@@ -20,7 +20,10 @@ function addInstanceProperties<T extends object>(
   serviceInstance: InstanceType<ServiceConstructor<T>>,
   targetObj: Record<PropertyKey, unknown>,
 ) {
-  const ownKeys = [...Object.getOwnPropertyNames(serviceInstance), ...Object.getOwnPropertySymbols(serviceInstance)];
+  const ownKeys = [
+    ...Object.getOwnPropertyNames(serviceInstance),
+    ...Object.getOwnPropertySymbols(serviceInstance),
+  ];
 
   for (const key of ownKeys) {
     if (hasKey(targetObj, key)) continue;
@@ -28,7 +31,9 @@ function addInstanceProperties<T extends object>(
     const descriptor = Object.getOwnPropertyDescriptor(serviceInstance, key)!;
 
     if (typeof descriptor.value === "function") {
-      console.warn(`[IOCRAFT]: Instance method "${String(key)}" found as own property. Consider moving to prototype.`);
+      console.warn(
+        `[IOCRAFT]: Instance method "${String(key)}" found as own property. Consider moving to prototype.`,
+      );
       continue;
     }
 
@@ -56,7 +61,10 @@ function addPrototypeProperties<T extends object>(
   let currentProto = Object.getPrototypeOf(serviceInstance);
 
   while (currentProto && currentProto !== Object.prototype) {
-    const protoKeys = [...Object.getOwnPropertyNames(currentProto), ...Object.getOwnPropertySymbols(currentProto)];
+    const protoKeys = [
+      ...Object.getOwnPropertyNames(currentProto),
+      ...Object.getOwnPropertySymbols(currentProto),
+    ];
 
     for (const key of protoKeys) {
       if (hasKey(targetObj, key)) continue;
@@ -67,8 +75,12 @@ function addPrototypeProperties<T extends object>(
 
       if (descriptor.get || descriptor.set) {
         Object.defineProperty(targetObj, key, {
-          get: descriptor.get ? () => descriptor.get!.call(serviceInstance) : undefined,
-          set: descriptor.set ? (v: any) => descriptor.set!.call(serviceInstance, v) : undefined,
+          get: descriptor.get
+            ? () => descriptor.get!.call(serviceInstance)
+            : undefined,
+          set: descriptor.set
+            ? (v: any) => descriptor.set!.call(serviceInstance, v)
+            : undefined,
           enumerable: true,
           configurable: true,
         });
