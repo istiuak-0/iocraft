@@ -108,7 +108,7 @@ const { count, increment, reset } = obtain(CounterService)
 </template>
 ```
 
-### `obtainNew` — Component-Scoped Instance
+### `obtainNew` — Scoped Instance
 
 Returns a fresh instance of the given service each time it is called.
 
@@ -139,7 +139,7 @@ Resolves a singleton from the root registry, just like obtain, but returns the a
 const auth = obtainRaw(AuthService)
 ```
 
-### `obtainRawNew` — Raw Component-Scoped Instance
+### `obtainRawNew` — Raw Scoped Instance
 
 Creates and returns a new raw instance of the service on every call, with no facade applied.
 
@@ -149,7 +149,7 @@ const uploader = obtainRawNew(UploadService)
 
 ## Store
 
-`store()` generates a reactive base class you can extend in any service. Use it instead of Pinia when your state belongs inside a service — reactive state, computed values, watchers, and reset with no external dependency.
+`store()` generates a reactive base class you can extend in any service. Use it instead of Pinia when your state belongs inside a service.
 
 ```ts
 import { attach, store } from 'iocraft'
@@ -171,13 +171,6 @@ export class UserStore extends store<UserState>({
   }
 
   nameUppercase = this.compute(s => s.name.toUpperCase())
-
-  constructor() {
-    super()
-    this.observe('role', (next, prev) => {
-      console.log(`Role changed from ${prev} to ${next}`)
-    })
-  }
 
   setUser(id: string, name: string, role: UserState['role']) {
     this.update({ id, name, role })
@@ -206,32 +199,39 @@ const user = obtain(UserStore)
 
 ### Store API
 
-**`state`** — The reactive state object. Read and write directly.
+**`state`** — The readonly reactive state object. Access properties directly for reading; use `update()` to mutate.
 
 ```ts
-user.state.name        // read
-user.state.name = 'x'  // write — reactive
+user.state.name   // read
+user.state.role   // read
+
+// Don't mutate directly
+user.state.name = 'x'
+
+// Use update() instead
+user.update({ name: 'x' })
+
 ```
 
-**`update(partial)`** — Merge a partial object into state. Preferred when setting multiple keys at once.
+`update(partial)` — Merge a partial object into state. Preferred when setting multiple keys at once.
 
 ```ts
 user.update({ name: 'Alice', role: 'admin' })
 ```
 
-**`snapshot`** — Plain non-reactive copy of current state via `toRaw`. Safe to serialize or log.
+`snapshot` — A plain, non-reactive copy of the current state via `toRaw`. Safe to serialize or log.
 
 ```ts
 JSON.stringify(user.snapshot)
 ```
 
-**`pick(key)`** — Read a single key from state.
+`pick(key)` — Read a single key from state.
 
 ```ts
 const role = user.pick('role')
 ```
 
-**`compute(fn)`** — Returns a `ComputedRef` derived from state. Stays reactive in templates and watchers.
+`compute(fn)` — Returns a `ComputedRef` derived from state. Stays reactive in templates and watchers.
 
 ```ts
 @attach()
@@ -243,19 +243,21 @@ const cart = obtain(CartStore)
 cart.total.value // reactive
 ```
 
-**`observe(key, cb)` / `observe(fn, cb)`** — Watch a key or derived value for changes.
+`observe(key, cb) / observe(fn, cb)` — Watch a state key or a derived value for changes. Returns a `WatchStopHandle` to stop watching.
 
 ```ts
+// Watch a key directly
 this.observe('role', (next, prev) => {
   if (next === 'admin') this.loadAdminData()
 })
 
-this.observe(s => s.items.length, (next) => {
+// Watch a derived value
+this.observe(s => s.items.length, (next, prev) => {
   console.log(`${next} items in cart`)
 })
 ```
 
-**`effect(fn)`** — `watchEffect` scoped to state. Re-runs whenever any accessed property changes.
+`effect(fn)` — Runs a `watchEffect` scoped to state. Re-runs whenever any accessed state property changes. Returns a `WatchStopHandle`.
 
 ```ts
 this.effect(s => {
@@ -263,7 +265,7 @@ this.effect(s => {
 })
 ```
 
-**`reset()`** — Restore state to the initial values defined in `store({ ... })`.
+`reset()` — Restores state to the initial values defined in `store({ ... })`.
 
 ```ts
 user.reset() // back to { id: null, name: '', role: 'guest' }
@@ -280,7 +282,8 @@ Provide a service from a parent component and inject it into any descendant. Use
 import { exposeCtx, obtainNew } from 'iocraft'
 import { CartService } from './services'
 
-exposeCtx(obtainNew(CartService))
+const cartService=obtainNew(CartService)
+exposeCtx(cartService)
 </script>
 ```
 
@@ -295,13 +298,9 @@ const cart = obtainCtx(CartService) // CartService | undefined
 </script>
 ```
 
-Use this for state scoped to a subtree — shopping carts, wizards, nested forms.
-
----
-
 ## Lifecycle Hooks
 
-Services created with `obtainNew` or `obtainRawNew` can define Vue lifecycle methods directly on the class. Since these services are tied to a specific component, iocraft automatically detects and binds any lifecycle methods to that component's lifecycle.
+Services can define Vue lifecycle methods directly on the class.When `obtainNew` or `obtainRawNew` is called inside a component's setup context, iocraft detects the active component instance and automatically binds any lifecycle methods defined on the service to that component's lifecycle.
 
 iocraft exports a typed interface for each supported hook. Implement them to get type checking and avoid typos.
 
@@ -339,19 +338,22 @@ const { data } = obtainNew(PollingService)
 </script>
 ```
 
+If `obtainNew` or `obtainRawNew` is called outside of a setup context then the lifecycle hooks are silently skipped.
+
 **Available interfaces:** `OnMounted` · `OnUnmounted` · `OnUpdated` · `OnBeforeMount` · `OnBeforeUpdate` · `OnBeforeUnmount` · `OnErrorCaptured` · `OnActivated` · `OnDeactivated` · `OnRenderTracked` · `OnRenderTriggered` · `OnServerPrefetch` · `OnScopeDispose`
 
-> Lifecycle hooks do not run for global singletons resolved via `obtain` — those have no component context to bind to.
+> Lifecycle hooks do not run for global singletons resolved via `obtain` or `obtainRaw` — those have no component context to bind to.
 
----
+
 
 ## Router Integration
 
-Pass your router to the plugin and iocraft registers a built-in `Nav` service — a flat reactive wrapper over `vue-router`. No need to call `useRouter()` and `useRoute()` separately.
+iocraft provides a built-in `Nav` service that exposes all routing features as a plain injectable service — no need to call `useRouter()` and `useRoute()` separately. To enable it, pass your router when registering the plugin:
 
 ```ts
 app.use(iocraft, { router })
 ```
+Once registered, `Nav` is available as a global singleton anywhere in your app:
 
 ```vue
 <script setup lang="ts">
@@ -372,17 +374,24 @@ const { push } = obtain(Nav)
 </template>
 ```
 
-**Reactive route properties:** `path` · `name` · `params` · `query` · `hash` · `fullPath` · `meta` · `matched` · `redirectedFrom` · `currentRoute`
 
-**Navigation:** `push(to)` · `replace(to)` · `go(delta)` · `back()` · `forward()`
+### Nav API
 
-**Route registry:** `addRoute()` · `removeRoute()` · `getRoutes()` · `hasRoute()` · `clearRoutes()`
+Reactive route properties: `path` · `name` · `params` · `query` · `hash` · `fullPath` · `meta` · `matched` · `redirectedFrom` · `currentRoute`
 
-**Guards:** `beforeEach()` · `beforeResolve()` · `afterEach()` · `onError()`
+Router state:  `options` · `listening` (readable and writable)
 
-**Other:** `resolve(to)` · `isReady()`
+Navigation:  `push(to)` · `replace(to)` · `go(delta)` · `back()` · `forward()`
 
----
+Route resolution:  `resolve(to)`
+
+Route registry: `addRoute()` · `removeRoute()` · `getRoutes()` · `hasRoute()` · `clearRoutes()`
+
+Guards: `beforeEach()` · `beforeResolve()` · `afterEach()` · `onError()`
+
+Lifecycle:  `isReady()`
+
+
 
 ## License
 
