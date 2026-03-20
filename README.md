@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="./assets/banner.svg" alt="iocraft" width="100%" />
+  <img src="https://raw.githubusercontent.com/istiuak-0/iocraft/main/assets/banner.svg" alt="iocraft" width="100%" />
 
 [![npm version](https://img.shields.io/npm/v/iocraft?color=3dd68c&labelColor=0d0d0e&label=npm)](https://www.npmjs.com/package/iocraft)
 [![license](https://img.shields.io/badge/license-MIT-3dd68c?labelColor=0d0d0e)](./LICENSE)
