@@ -51,7 +51,7 @@ With options:
 ```ts
 app.use(iocraft, {
   router,                    // enables the built-in Nav service
-  eagerLoad: [AuthService],  // instantiate on boot, not on first use
+  eagerLoad: [AuthService],  // Eagerly initiate services
 })
 ```
 
@@ -152,7 +152,8 @@ const uploader = obtainRawNew(UploadService)
 `store()` generates a reactive base class you can extend in any service. Use it instead of Pinia when your state belongs inside a service.
 
 ```ts
-import { attach, store } from 'iocraft'
+import { attach } from 'iocraft'
+import { store } from 'iocraft/common'
 
 interface UserState {
   id: string | null

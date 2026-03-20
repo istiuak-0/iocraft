@@ -5,7 +5,7 @@ import { attach } from "../core";
 export class Nav {
   constructor(private router: Router) {}
 
-  // ─── Flattened current route getters
+  // Flattened current route getters
   get path() {
     return this.router.currentRoute.value.path;
   }
@@ -34,7 +34,7 @@ export class Nav {
     return this.router.currentRoute.value.redirectedFrom;
   }
 
-  // ─── Router state
+  // Router state
   get currentRoute() {
     return this.router.currentRoute;
   }
@@ -49,7 +49,7 @@ export class Nav {
     this.router.listening = value;
   }
 
-  // ─── Navigation
+  // Navigation
   push(...args: Parameters<Router["push"]>) {
     return this.router.push(...args);
   }
@@ -66,12 +66,12 @@ export class Nav {
     return this.router.forward();
   }
 
-  // ─── Route resolution
+  // Route resolution
   resolve(...args: Parameters<Router["resolve"]>) {
     return this.router.resolve(...args);
   }
 
-  // ─── Route registry
+  // Route registry
   getRoutes() {
     return this.router.getRoutes();
   }
@@ -88,7 +88,7 @@ export class Nav {
     return this.router.clearRoutes();
   }
 
-  // ─── Navigation guards
+  // Navigation guards
   beforeEach(...args: Parameters<Router["beforeEach"]>) {
     return this.router.beforeEach(...args);
   }
@@ -102,7 +102,7 @@ export class Nav {
     return this.router.onError(...args);
   }
 
-  // ─── Lifecycle
+  // Lifecycle
   isReady() {
     return this.router.isReady();
   }
