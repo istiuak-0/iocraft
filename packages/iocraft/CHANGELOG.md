@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.2.10](https://github.com/istiuak-0/iocraft/compare/v0.2.9...v0.2.10) (2026-03-20)
+
+
+### Bug Fixes
+
+* minor patches ([#44](https://github.com/istiuak-0/iocraft/issues/44)) ([28946b7](https://github.com/istiuak-0/iocraft/commit/28946b78beb6a253f650c643091749849e8c74de))
+
 ## [0.2.9](https://github.com/istiuak-0/iocraft/compare/v0.2.8...v0.2.9) (2026-03-09)
 
 
