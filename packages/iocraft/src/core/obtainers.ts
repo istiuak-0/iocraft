@@ -16,7 +16,9 @@ export function obtain<T extends ServiceConstructor>(serviceClass: T) {
   }
 
   if (creationStack.has(serviceMeta.token)) {
-    throw new Error(`[IocRaft] Circular dependency detected on: ${serviceClass.name}\n`);
+    throw new Error(
+      `[IocRaft] Circular dependency detected on: ${serviceClass.name}\n`,
+    );
   }
 
   creationStack.add(serviceMeta.token);
@@ -29,7 +31,6 @@ export function obtain<T extends ServiceConstructor>(serviceClass: T) {
     creationStack.delete(serviceMeta.token);
   }
 }
-
 
 /**
  * obtain raw instance is a service from service registry
@@ -42,7 +43,9 @@ export function obtainRaw<T extends ServiceConstructor>(serviceClass: T) {
   }
 
   if (creationStack.has(serviceMeta.token)) {
-    throw new Error(`[IocRaft] Circular dependency detected on: ${serviceClass.name}\n`);
+    throw new Error(
+      `[IocRaft] Circular dependency detected on: ${serviceClass.name}\n`,
+    );
   }
 
   creationStack.add(serviceMeta.token);
@@ -56,9 +59,6 @@ export function obtainRaw<T extends ServiceConstructor>(serviceClass: T) {
   }
 }
 
-
-
-
 /**
  * obtain a raw instance of the service that is transient and not tied to service registry
  */
@@ -66,7 +66,9 @@ export function obtainRawNew<T extends ServiceConstructor>(serviceClass: T) {
   const serviceMeta = getServiceMeta(serviceClass);
 
   if (creationStack.has(serviceMeta.token)) {
-    throw new Error(`[IocRaft] Circular dependency detected on: ${serviceClass.name}\n`);
+    throw new Error(
+      `[IocRaft] Circular dependency detected on: ${serviceClass.name}\n`,
+    );
   }
 
   creationStack.add(serviceMeta.token);
@@ -84,8 +86,6 @@ export function obtainRawNew<T extends ServiceConstructor>(serviceClass: T) {
   }
 }
 
-
-
 /**
  * obtain a facade of a new Service Instance
  */
@@ -93,7 +93,9 @@ export function obtainNew<T extends ServiceConstructor>(serviceClass: T) {
   const serviceMeta = getServiceMeta(serviceClass);
 
   if (creationStack.has(serviceMeta.token)) {
-    throw new Error(`[IocRaft] Circular dependency detected on: ${serviceClass.name}\n`);
+    throw new Error(
+      `[IocRaft] Circular dependency detected on: ${serviceClass.name}\n`,
+    );
   }
 
   creationStack.add(serviceMeta.token);
@@ -112,11 +114,12 @@ export function obtainNew<T extends ServiceConstructor>(serviceClass: T) {
   }
 }
 
-
 /**
  * Expose a service to context
  */
-export function exposeCtx<T extends ServiceConstructor>(serviceInstance: InstanceType<T>) {
+export function exposeCtx<T extends ServiceConstructor>(
+  serviceInstance: InstanceType<T>,
+) {
   const serviceMeta = getServiceMeta(serviceInstance);
   provide(serviceMeta.token, serviceInstance);
 }

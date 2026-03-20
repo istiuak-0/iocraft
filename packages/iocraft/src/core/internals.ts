@@ -12,9 +12,9 @@ import {
   onDeactivated,
   onServerPrefetch,
   onScopeDispose,
-} from 'vue';
+} from "vue";
 
-export const SERVICE_METADATA = Symbol('IOCRAFT_SERVICE_METADATA');
+export const SERVICE_METADATA = Symbol("IOCRAFT_SERVICE_METADATA");
 export const RootRegistry = new Map<symbol, object>();
 export const creationStack = new Set<symbol>();
 const lifecycleHookMap = {
@@ -40,7 +40,7 @@ export function bindLifecycleHooks(instance: any) {
 
     const handler = instance[hookName];
 
-    if (typeof handler === 'function') {
+    if (typeof handler === "function") {
       vueHook(handler.bind(instance));
     }
   }

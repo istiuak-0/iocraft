@@ -6,7 +6,9 @@ export function getServiceMeta(target: ServiceConstructor | object) {
 
   const meta = (ctor as any)[SERVICE_METADATA] as ServiceMetadata;
   if (!meta?.token) {
-    throw new Error(`[IOCRAFT]: ${ctor?.name || "Unknown"} is not decorated with @attach()`);
+    throw new Error(
+      `[IOCRAFT]: ${ctor?.name || "Unknown"} is not decorated with @attach()`,
+    );
   }
   return meta;
 }
