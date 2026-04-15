@@ -34,7 +34,7 @@ iocraft uses decorators, so you must enable experimental decorators in your Type
 
 Update your `tsconfig.app.json` (typical Vue / Vite setup):
 
-```json
+```json5
 {
   "extends": "@vue/tsconfig/tsconfig.dom.json",
   "include": ["env.d.ts", "src/**/*", "src/**/*.vue"],
