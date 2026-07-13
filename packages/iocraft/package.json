@@ -1,6 +1,6 @@
 {
   "name": "iocraft",
-  "version": "0.2.11",
+  "version": "0.3.0",
   "description": "A lightweight IOC container for Vue 3 using the Composition API.",
   "keywords": [
     "vue",
@@ -61,7 +61,6 @@
     "node": ">=18.0.0"
   },
   "publishConfig": {
-    "access": "public",
-    "provenance": true
+    "access": "public"
   }
 }
