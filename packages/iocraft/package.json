@@ -30,14 +30,8 @@
   "type": "module",
   "exports": {
     ".": {
-      "types": "./dist/core.d.ts",
-      "import": "./dist/core.js",
-      "require": "./dist/core.cjs"
-    },
-    "./common": {
-      "types": "./dist/common.d.ts",
-      "import": "./dist/common.js",
-      "require": "./dist/common.cjs"
+      "types": "./dist/iocraft.d.ts",
+      "import": "./dist/iocraft.js"
     }
   },
   "files": [

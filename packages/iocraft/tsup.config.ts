@@ -2,20 +2,10 @@ import { defineConfig } from "tsup";
 
 export default defineConfig({
   entry: {
-    core: "./src/core.ts",
-    common: "./src/common.ts",
+    iocraft: "./src/core.ts",
   },
-  format: ["esm", "cjs"],
-  dts: { resolve: true },
-  sourcemap: true,
+  format: "esm",
+  dts: true,
   clean: true,
-  splitting: true,
-  minify: false,
-  external: ["vue", "vue-router", "pinia"],
   outDir: "dist",
-
-  esbuildOptions(options) {
-    options.target = "es2022";
-    options.banner = { js: '"use strict";' };
-  },
 });

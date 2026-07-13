@@ -6,6 +6,5 @@
     "declaration": true,
     "declarationMap": true,
     "emitDeclarationOnly": true,
-    "declarationDir": "./dist/types"
   }
 }
