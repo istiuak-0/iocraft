@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.2.12](https://github.com/istiuak-0/iocraft/compare/v0.2.11...v0.2.12) (2026-07-13)
+
+
+### Features
+
+* restructure apis ([9a49073](https://github.com/istiuak-0/iocraft/commit/9a490732058eca93ab5cb529c7a352ac0a06fe09))
+
 ## [0.2.11](https://github.com/istiuak-0/iocraft/compare/v0.2.10...v0.2.11) (2026-03-20)
 
 
