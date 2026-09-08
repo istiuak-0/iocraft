@@ -7,7 +7,7 @@
 
 </div>
 
-**iocraft** is a dependency injection container for Vue 3 built on the Composition API. Write plain TypeScript classes as services with full Vue reactivity and zero boilerplate.
+**iocraft** is a dependency injection container for Vue 3 built on the Composition API.
 
 ## Table of Contents
 
@@ -17,7 +17,6 @@
 - [Services](#services)
 - [Obtaining Services](#obtaining-services)
 - [Context (Scoped) Services](#context-scoped-services)
-- [Lifecycle Hooks](#lifecycle-hooks)
 - [Router Integration](#router-integration)
 
 ## Installation
@@ -102,9 +101,9 @@ export class CounterService {
 
 ## Obtaining Services
 
-### `obtain` — Global Singleton
+### `obtain`
 
-Resolves a singleton from the root registry. Created once on first call, reused for the lifetime of the app. Returns a facade — a thin wrapper that proxies each property through getters/setters linked to the original instance, preserving reactivity even when destructuring.
+`obtain` Resolves a singleton from the registry. Initiates the class once on first call, and reuses that instance for the lifetime of the app. It returns a facade of that class instance, which is a thin wrapper that proxies each property through getters/setters linked to the original instance, preserving reactivity even when destructuring.
 
 ```vue
 <script setup lang="ts">
@@ -122,17 +121,17 @@ const { count, increment, reset } = obtain(CounterService);
 </template>
 ```
 
-### `obtain.raw()` — Raw Singleton
+### `obtain.raw`
 
-Resolves a singleton from the root registry, just like `obtain`, but returns the actual class instance with no facade applied.
+`obtain.raw` Resolves a singleton from the root registry, just like `obtain`, but returns the actual class instance with no facade applied.
 
 ```ts
 const auth = obtain.raw(AuthService);
 ```
 
-### `obtain.instance()` — Scoped Instance
+### `obtain.instance`
 
-Returns a fresh facade of the given service on each call — no singleton, no registry, just a new instance wrapped in a reactive facade.
+`obtain.instance` Returns a fresh facade of the given service on each call.
 
 ```vue
 <script setup lang="ts">
