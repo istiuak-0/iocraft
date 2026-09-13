@@ -35,3 +35,6 @@ cache
 
 # Vitest
 __screenshots__/
+
+# Beachball
+change/

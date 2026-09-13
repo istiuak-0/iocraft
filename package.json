@@ -10,11 +10,15 @@
     "playground:dev": "pnpm --filter @iocraft/playground dev",
     "typecheck": "pnpm --recursive typecheck",
     "iocraft:test": "pnpm --filter iocraft  test",
-    "iocraft:bench": "pnpm --filter iocraft  bench"
+    "iocraft:bench": "pnpm --filter iocraft  bench",
+    "change": "beachball change",
+    "bump": "beachball bump",
+    "release": "beachball publish --yes --access public"
   },
   "packageManager": "pnpm@10.18.0",
   "devDependencies": {
-    "@types/node": "^25.2.0",
+    "@types/node": "^25.9.6",
+    "beachball": "^2.66.0",
     "typescript": "~5.9.3"
   }
 }

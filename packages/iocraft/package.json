@@ -49,11 +49,11 @@
     "vue-router": "^4.0.0"
   },
   "devDependencies": {
-    "@vue/test-utils": "^2.4.6",
+    "@vue/test-utils": "^2.5.0",
     "jsdom": "^28.1.0",
     "tsup": "^8.5.1",
     "typescript": "~5.9.3",
-    "vitest": "^4.0.16",
+    "vitest": "^4.1.11",
     "vue": "catalog:",
     "vue-router": "^4.6.4"
   },
