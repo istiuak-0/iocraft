@@ -1,24 +1,69 @@
 {
-  "name": "@iocraft/root",
-  "description": "Monorepo for iocraft",
-  "private": true,
+  "name": "iocraft",
+  "version": "0.3.0",
+  "description": "A lightweight IOC container for Vue 3 using the Composition API.",
+  "type": "module",
+  "license": "MIT",
+  "homepage": "https://github.com/istiuak-0/iocraft#readme",
+  "bugs": {
+    "url": "https://github.com/istiuak-0/iocraft/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/istiuak-0/iocraft.git"
+  },
+  "author": {
+    "name": "Istiuak",
+    "url": "https://github.com/istiuak-0"
+  },
+  "keywords": [
+    "vue",
+    "vue3",
+    "dependency-injection",
+    "di",
+    "ioc",
+    "Inversion of Control",
+    "composition-api",
+    "typescript",
+    "vue-plugin"
+  ],
+  "exports": {
+    "types": "./dist/index.d.ts",
+    "import": "./dist/index.js"
+  },
+  "files": [
+    "dist"
+  ],
   "scripts": {
-    "i:all": "pnpm --recursive install",
-    "clean": "find . -name node_modules -type d -exec rm -rf {} + && rm -rf node_modules",
-    "iocraft:build": "pnpm --filter iocraft build",
-    "iocraft:dev": "pnpm --filter iocraft dev",
-    "playground:dev": "pnpm --filter @iocraft/playground dev",
-    "typecheck": "pnpm --recursive typecheck",
-    "iocraft:test": "pnpm --filter iocraft  test",
-    "iocraft:bench": "pnpm --filter iocraft  bench",
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest",
+    "bench": "vitest bench",
     "change": "beachball change",
     "bump": "beachball bump",
     "release": "beachball publish --yes --access public"
   },
-  "packageManager": "pnpm@10.18.0",
+  "peerDependencies": {
+    "vue": "^3.0.0",
+    "vue-router": "^4.0.0"
+  },
   "devDependencies": {
     "@types/node": "^25.9.6",
+    "@vue/test-utils": "^2.4.6",
     "beachball": "^2.66.0",
-    "typescript": "~5.9.3"
-  }
+    "jsdom": "^28.1.0",
+    "tsup": "^8.5.1",
+    "typescript": "~5.9.3",
+    "vitest": "^4.0.16",
+    "vue": "^3.5.26",
+    "vue-router": "^4.6.4"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "packageManager": "pnpm@10.18.0"
 }
