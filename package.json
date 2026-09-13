@@ -25,7 +25,6 @@
     "Inversion of Control",
     "composition-api",
     "typescript",
-    "spa",
     "vue-plugin"
   ],
   "exports": {
