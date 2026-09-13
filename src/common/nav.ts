@@ -1,5 +1,6 @@
 import type { Router } from "vue-router";
-import { attach } from "../core";
+import { attach } from "../core/attach";
+
 
 @attach()
 export class Nav {

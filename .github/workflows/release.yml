@@ -30,7 +30,7 @@ jobs:
 
             - run: pnpm install --frozen-lockfile
 
-            - run: pnpm iocraft:build
+            - run: pnpm build
 
             - name: Configure git
               run: |

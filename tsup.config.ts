@@ -1,9 +1,7 @@
 import { defineConfig } from "tsup";
 
 export default defineConfig({
-  entry: {
-    iocraft: "./src/core.ts",
-  },
+  entry: ["./src/index.ts"],
   format: "esm",
   dts: true,
   clean: true,
