@@ -1,6 +1,6 @@
 {
   "type": "minor",
-  "comment": "convert to normal repo",
+  "comment": "clean up deps",
   "packageName": "iocraft",
   "email": "istiuak.0@gmail.com",
   "dependentChangeType": "patch"
