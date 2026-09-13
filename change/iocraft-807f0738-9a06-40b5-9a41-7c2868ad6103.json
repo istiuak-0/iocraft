@@ -1,7 +1,0 @@
-{
-  "type": "minor",
-  "comment": "convert to normal repo",
-  "packageName": "iocraft",
-  "email": "istiuak.0@gmail.com",
-  "dependentChangeType": "patch"
-}
